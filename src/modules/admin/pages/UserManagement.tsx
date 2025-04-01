@@ -1345,8 +1345,8 @@ const UserManagement = () => {
                       }
                       fullWidth
                       margin="dense"
-                      slotProps={{
-                        inputLabel: { shrink: true },
+                      InputLabelProps={{
+                        shrink: true,
                       }}
                     />
                   </div>
@@ -1361,8 +1361,8 @@ const UserManagement = () => {
                       }
                       fullWidth
                       margin="dense"
-                      slotProps={{
-                        inputLabel: { shrink: true },
+                      InputLabelProps={{
+                        shrink: true,
                       }}
                     />
                   </div>
