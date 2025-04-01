@@ -5,10 +5,10 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { TextField, Checkbox, FormControlLabel, Button, InputAdornment, IconButton, CircularProgress, Typography } from "@mui/material";
 import { forgotPassword, getUserInfo, login } from "../services/authService";
-import { Swiper, SwiperSlide } from "swiper/react";
+// import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+// import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 interface LoginFormInputs {
@@ -31,11 +31,11 @@ const Login: React.FC = () => {
     ["Streamline Claims,", "Enhance Efficiency"],
   ]
 
-  const images = [
-    "https://images.unsplash.com/photo-1726066012825-b1ab9ba6e158?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1554232456-8727aae0cfa4?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "https://images.unsplash.com/photo-1693533846949-5df11d41642e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  ]
+  // const images = [
+  //   "https://images.unsplash.com/photo-1726066012825-b1ab9ba6e158?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  //   "https://images.unsplash.com/photo-1554232456-8727aae0cfa4?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  //   "https://images.unsplash.com/photo-1693533846949-5df11d41642e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  // ]
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -322,7 +322,7 @@ const Login: React.FC = () => {
             <p>{slogans[index][0]}</p>
             <p>{slogans[index][1]}</p>
           </div>
-          <Swiper
+          {/* <Swiper
             loop
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             pagination={{ clickable: true }}
@@ -334,7 +334,7 @@ const Login: React.FC = () => {
                 <img src={src} alt={`Slide ${index}`} style={{ width: "100%" }} />
               </SwiperSlide>
             ))}
-          </Swiper>
+          </Swiper> */}
         </div>
       </div>
     </div>
