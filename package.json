@@ -26,6 +26,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.17.1",
+    "@mui/lab": "^5.0.0-alpha.176",
     "@mui/material": "^5.17.1",
     "@tailwindcss/vite": "^4.0.17",
     "animate.css": "^4.1.1",
