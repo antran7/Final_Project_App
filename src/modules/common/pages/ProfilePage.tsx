@@ -170,12 +170,8 @@ const ProfilePage: React.FC = () => {
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: { 'image/*': [] },
+    accept: { "image/*": [] },
     onDrop,
-    multiple: true,
-    onDragEnter: (_: React.DragEvent<HTMLElement>) => console.log('Drag entered'),
-    onDragLeave: (_: React.DragEvent<HTMLElement>) => console.log('Drag left'),
-    onDragOver: (_: React.DragEvent<HTMLElement>) => console.log('Dragging over'),
   });
 
   const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
@@ -362,7 +358,7 @@ const ProfilePage: React.FC = () => {
                           textAlign: "center",
                           cursor: "pointer",
                         }}>
-                          <input {...getInputProps()} {...(getInputProps() as React.InputHTMLAttributes<HTMLInputElement>)} />
+                          <input {...getInputProps()} />
                           <p>Drag & drop images here or click to select images</p>
                         </div>
                       ) : (
