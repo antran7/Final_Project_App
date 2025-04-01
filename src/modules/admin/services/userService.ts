@@ -12,7 +12,7 @@ export const searchUsers = async (
       pageInfo,
     });
 
-    console.log("Full API Response:", response); // ✅ Debug response
+    console.log("Full API Response:", response); 
 
     return response.data ?? {
       pageData: [],
@@ -88,10 +88,10 @@ export const changeUserRole = async (userId : string, roleCode : string) => {
   }
 };
 
-export const getEmployeeById = async (userId: string): Promise<Employee> => {
+export const getEmployeeById = async (id: string): Promise<Employee> => {
   try {
     const response = await apiService.get<Employee>(
-      `/employees/${userId}`
+      `/employees/${id}`
     );
 
     console.log("Backend API Response:", response);
@@ -105,14 +105,14 @@ export const getEmployeeById = async (userId: string): Promise<Employee> => {
 
     return employeeData;
   } catch (error) {
-    console.error(`Failed to fetch employee with ID: ${userId}`, error);
+    console.error(`Failed to fetch employee with ID: ${id}`, error);
     throw new Error(error instanceof Error ? error.message : "An unknown error occurred");
   }
 };
 
-export const updateEmployee = async (userId: string, employeeData: Record<string, unknown>): Promise<void> => {
+export const updateEmployee = async (id: string, employeeData: Record<string, unknown>): Promise<void> => {
   try {
-    const response = await apiService.put(`/employees/${userId}`, employeeData);
+    const response = await apiService.put(`/employees/${id}`, employeeData);
     console.log("API Response:", response);
   } catch (error) {
     console.error("API Error:", error instanceof Error ? error.message : "Unknown error");
@@ -132,6 +132,26 @@ export const fetchJobRanks = async () => {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch job ranks:", error);
+    return [];
+  }
+};
+
+export const fetchDepartments = async () => {
+  try {
+    const response = await apiService.get("/departments/get-all");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch departments:", error);
+    return [];
+  }
+};
+
+export const fetchContracts = async () => {
+  try {
+    const response = await apiService.get("/contracts/get-all");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch contracts:", error);
     return [];
   }
 };
