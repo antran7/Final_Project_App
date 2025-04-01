@@ -10,7 +10,7 @@ export const financeRoutes: RouteObject[] = [
     children: [
       {
         path: "",
-        element: <Navigate to="claims" replace />
+        element: <Navigate to="claims" replace />,
       },
       {
         path: "claims",
