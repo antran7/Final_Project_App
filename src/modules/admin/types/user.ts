@@ -1,4 +1,3 @@
-
 export interface User {
     _id: string; 
     email: string;
@@ -29,7 +28,7 @@ export interface User {
     user_id: string;
     job_rank: string;
     contract_type: string;
-    account?: string;
+    account: string;
     address: string;
     phone: string;
     full_name: string;
@@ -42,6 +41,7 @@ export interface User {
     created_at?: string | Date;
     updated_at?: string| Date;
     is_deleted: boolean;
+    __v: number;
   }
   
   export interface EmployeeData {
