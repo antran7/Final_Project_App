@@ -24,7 +24,9 @@
   },
   "dependencies": {
     "@mui/material": "^5.15.16",
+    "axios": "^1.8.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.3"
   }
 }
