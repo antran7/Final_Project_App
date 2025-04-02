@@ -136,7 +136,13 @@ const RequestPage = () => {
   const [isLogModalVisible, setIsLogModalVisible] = useState(false);
   const [currentRequest, setCurrentRequest] = useState<Request | null>(null);
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true); // General loading for initial fetch
+  const [isAdding, setIsAdding] = useState<boolean>(false); // Loading for adding
+  const [isEditing, setIsEditing] = useState<boolean>(false); // Loading for editing
+  const [isFetchingLogs, setIsFetchingLogs] = useState<boolean>(false); // Loading for logs
+  const [isApproving, setIsApproving] = useState<boolean>(false); // Loading for approval
+  const [isCanceling, setIsCanceling] = useState<boolean>(false); // Loading for canceling
+  const [isOpeningModal, setIsOpeningModal] = useState<boolean>(false); // Loading for opening Add Request Modal
   const [selectedApproverName, setSelectedApproverName] = useState<string>("");
   const [selectedProjectName, setSelectedProjectName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
@@ -153,6 +159,8 @@ const RequestPage = () => {
   const [selectedRequestForDownload, setSelectedRequestForDownload] = useState<Request | null>(null);
   const [isUserInfoModalVisible, setIsUserInfoModalVisible] = useState(false);
   const [selectedUserInfo, setSelectedUserInfo] = useState<Approver | null>(null);
+  const [isFetchingUserInfo, setIsFetchingUserInfo] = useState<boolean>(false); // Loading for user info
+  const [loadingUser, setLoadingUser] = useState<string | null>(null); // Track which user is being loaded
 
   const {
     control,
@@ -355,6 +363,7 @@ const RequestPage = () => {
   };
 
   const fetchClaimLogs = async (claimId: string) => {
+    setIsFetchingLogs(true);
     try {
       console.log("Fetching logs for claimId:", claimId);
       const response = await axios.post(
@@ -390,13 +399,16 @@ const RequestPage = () => {
         console.error("Error details:", error.response?.data);
       }
       setClaimLogs([]);
+    } finally {
+      setIsFetchingLogs(false);
     }
   };
 
   const fetchUserInfo = async (username: string) => {
+    setLoadingUser(username); // Set the user being loaded
+    setIsFetchingUserInfo(true);
     try {
       console.log("Searching for user with username:", username);
-      // Bước 1: Tìm userId từ username bằng API /users/search
       const searchResponse = await axios.post(
         `${API_URL}/users/search`,
         {
@@ -422,7 +434,9 @@ const RequestPage = () => {
         const userId = searchResponse.data.data.pageData[0]._id;
         console.log("Found userId:", userId);
 
-        // Bước 2: Gọi API /users/{userId} để lấy thông tin chi tiết
+        // Giả lập độ trễ để thấy loading (có thể bỏ sau khi kiểm tra)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         const response = await axios.get(`${API_URL}/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -447,6 +461,9 @@ const RequestPage = () => {
       } else {
         toast.error("Network error or server unreachable");
       }
+    } finally {
+      setIsFetchingUserInfo(false);
+      setLoadingUser(null); // Reset loading user
     }
   };
 
@@ -464,12 +481,30 @@ const RequestPage = () => {
     }
   };
 
+  const handleOpenAddModal = async () => {
+    setIsOpeningModal(true);
+    try {
+      // Giả lập độ trễ để thấy loading (có thể bỏ sau khi kiểm tra)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Đảm bảo dữ liệu projects và approvers đã được fetch trước khi mở modal
+      await Promise.all([ensureProjectsFetched(), ensureApproversFetched()]);
+      setIsAddModalVisible(true);
+    } catch (error) {
+      console.error("Error preparing Add Request Modal:", error);
+      toast.error("Failed to load modal data");
+    } finally {
+      setIsOpeningModal(false);
+    }
+  };
+
   const handleAddModalOk = async (data: FormValues) => {
     if (!userId || !token) {
       console.error("Missing userId or token");
       return;
     }
 
+    console.log("Starting add request process...");
+    setIsAdding(true);
     try {
       const newRequest = {
         user_id: userId,
@@ -484,6 +519,9 @@ const RequestPage = () => {
       };
 
       console.log("Submitting newRequest:", newRequest);
+
+      // Thêm độ trễ giả lập để kiểm tra loading (có thể bỏ sau khi xác nhận loading hoạt động)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const response = await axios.post(`${API_URL}/claims`, newRequest, {
         headers: {
@@ -514,6 +552,9 @@ const RequestPage = () => {
     } catch (error) {
       console.error("Error adding request:", error);
       toast.error("Failed to add request");
+    } finally {
+      console.log("Finished add request process.");
+      setIsAdding(false);
     }
   };
 
@@ -523,6 +564,7 @@ const RequestPage = () => {
       return;
     }
 
+    setIsEditing(true);
     try {
       const updatedRequest = {
         _id: currentRequest._id,
@@ -587,6 +629,8 @@ const RequestPage = () => {
           icon: "❌",
         });
       }
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -622,6 +666,7 @@ const RequestPage = () => {
   const handleConfirmApproval = async () => {
     if (requestToApprove === null || !token) return;
 
+    setIsApproving(true);
     try {
       const response = await axios.put(
         `${API_URL}/claims/change-status`,
@@ -672,6 +717,8 @@ const RequestPage = () => {
           icon: "❌",
         });
       }
+    } finally {
+      setIsApproving(false);
     }
   };
 
@@ -687,14 +734,18 @@ const RequestPage = () => {
     setIsEditModalVisible(false);
     setIsDeleteModalVisible(false);
     setIsLogModalVisible(false);
-    setIsUserInfoModalVisible(false);
     setCurrentRequest(null);
     
     reset();
     clearErrors();
     setSelectedApproverName("");
     setSelectedProjectName("");
+  };
+
+  const handleCloseUserInfoModal = () => {
+    setIsUserInfoModalVisible(false);
     setSelectedUserInfo(null);
+    // Không đóng modal Claim Logs, chỉ reset thông tin user
   };
 
   const handleRequestCancel = async (id: string) => {
@@ -705,6 +756,7 @@ const RequestPage = () => {
   const handleConfirmCancel = async () => {
     if (requestToDelete === null || !token) return;
 
+    setIsCanceling(true);
     try {
       const response = await axios.put(
         `${API_URL}/claims/change-status`,
@@ -755,6 +807,8 @@ const RequestPage = () => {
           icon: "❌",
         });
       }
+    } finally {
+      setIsCanceling(false);
     }
   };
 
@@ -907,18 +961,27 @@ const RequestPage = () => {
                   sx={{ minWidth: "200px" }}
                 />
               </div>
-              <Button
-                variant="contained"
-                onClick={() => setIsAddModalVisible(true)}
-                sx={{
-                  backgroundColor: "#CBE82A",
-                  "&:hover": {
-                    backgroundColor: "#81eee8",
-                  },
-                }}
-              >
-                + Add Request
-              </Button>
+              {isOpeningModal ? (
+                <div className="flex flex-row gap-2">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleOpenAddModal}
+                  sx={{
+                    backgroundColor: "#CBE82A",
+                    "&:hover": {
+                      backgroundColor: "#81eee8",
+                    },
+                  }}
+                  disabled={isOpeningModal}
+                >
+                  + Add Request
+                </Button>
+              )}
             </div>
 
             {loading ? (
@@ -1151,205 +1214,215 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              <form onSubmit={handleSubmit(handleAddModalOk)}>
-                <Controller
-                  name="claim_name"
-                  control={control}
-                  rules={{ required: "Claim name is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Request Name *"
-                      fullWidth
-                      margin="normal"
-                      error={!!errors.claim_name}
-                      helperText={errors.claim_name?.message}
-                    />
-                  )}
-                />
-                <Controller
-                  name="project_id"
-                  control={control}
-                  rules={{ required: "Project is required" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth margin="normal" error={!!errors.project_id}>
-                      <Autocomplete
-                        freeSolo
-                        options={projects.map((project) => project.project_name)}
-                        value={selectedProjectName || ""}
-                        onInputChange={(_, newInputValue) => {
-                          setSelectedProjectName(newInputValue);
-                          debouncedFetchProjects(newInputValue);
-                          const selectedProject = projects.find(
-                            (project) => project.project_name === newInputValue
-                          );
-                          field.onChange(selectedProject?._id || "");
+              {isAdding ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="flex flex-row gap-2">
+                    <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                    <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                    <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit(handleAddModalOk)}>
+                  <Controller
+                    name="claim_name"
+                    control={control}
+                    rules={{ required: "Claim name is required" }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Request Name *"
+                        fullWidth
+                        margin="normal"
+                        error={!!errors.claim_name}
+                        helperText={errors.claim_name?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="project_id"
+                    control={control}
+                    rules={{ required: "Project is required" }}
+                    render={({ field }) => (
+                      <FormControl fullWidth margin="normal" error={!!errors.project_id}>
+                        <Autocomplete
+                          freeSolo
+                          options={projects.map((project) => project.project_name)}
+                          value={selectedProjectName || ""}
+                          onInputChange={(_, newInputValue) => {
+                            setSelectedProjectName(newInputValue);
+                            debouncedFetchProjects(newInputValue);
+                            const selectedProject = projects.find(
+                              (project) => project.project_name === newInputValue
+                            );
+                            field.onChange(selectedProject?._id || "");
+                          }}
+                          onChange={(_, newValue) => {
+                            const selectedProject = projects.find(
+                              (project) => project.project_name === newValue
+                            );
+                            field.onChange(selectedProject?._id || "");
+                            setSelectedProjectName(newValue || "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Project Name *"
+                              error={!!errors.project_id}
+                              helperText={errors.project_id?.message}
+                              onChange={(e) => {
+                                debouncedFetchProjects(e.target.value);
+                              }}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <Controller
+                    name="approval_id"
+                    control={control}
+                    rules={{ required: "Approver is required" }}
+                    render={({ field }) => (
+                      <FormControl fullWidth margin="normal" error={!!errors.approval_id}>
+                        <Autocomplete
+                          freeSolo
+                          options={approvers.map((approver) => approver.user_name)}
+                          value={selectedApproverName}
+                          onInputChange={(_, newInputValue) => {
+                            setSelectedApproverName(newInputValue);
+                            debouncedFetchApprovers(newInputValue);
+                            const selectedApprover = approvers.find(
+                              (approver) => approver.user_name === newInputValue
+                            );
+                            field.onChange(selectedApprover?._id || "");
+                          }}
+                          onChange={(_, newValue) => {
+                            const selectedApprover = approvers.find(
+                              (approver) => approver.user_name === newValue
+                            );
+                            field.onChange(selectedApprover?._id || "");
+                            setSelectedApproverName(newValue || "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Approver *"
+                              error={!!errors.approval_id}
+                              helperText={errors.approval_id?.message}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
+                      <Controller
+                        name="claim_start_date"
+                        control={control}
+                        rules={{
+                          required: "Start date is required",
+                          validate: (value) => {
+                            const selectedProject = projects.find((p) => p._id === watch("project_id"));
+                            if (!selectedProject) return "Please select a project first";
+                            const projectStart = moment(selectedProject.project_start_date);
+                            const projectEnd = moment(selectedProject.project_end_date);
+                            if (value && value.isBefore(projectStart, "day")) {
+                              return "Start date cannot be before project start date";
+                            }
+                            if (value && value.isAfter(projectEnd, "day")) {
+                              return "Start date cannot be after project end date";
+                            }
+                            return true;
+                          },
                         }}
-                        onChange={(_, newValue) => {
-                          const selectedProject = projects.find(
-                            (project) => project.project_name === newValue
-                          );
-                          field.onChange(selectedProject?._id || "");
-                          setSelectedProjectName(newValue || "");
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Project Name *"
-                            error={!!errors.project_id}
-                            helperText={errors.project_id?.message}
-                            onChange={(e) => {
-                              debouncedFetchProjects(e.target.value);
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Start Date *"
+                            value={field.value}
+                            onChange={(date) => field.onChange(date)}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: !!errors.claim_start_date,
+                                helperText: errors.claim_start_date?.message,
+                              },
                             }}
                           />
                         )}
                       />
-                    </FormControl>
-                  )}
-                />
-                <Controller
-                  name="approval_id"
-                  control={control}
-                  rules={{ required: "Approver is required" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth margin="normal" error={!!errors.approval_id}>
-                      <Autocomplete
-                        freeSolo
-                        options={approvers.map((approver) => approver.user_name)}
-                        value={selectedApproverName}
-                        onInputChange={(_, newInputValue) => {
-                          setSelectedApproverName(newInputValue);
-                          debouncedFetchApprovers(newInputValue);
-                          const selectedApprover = approvers.find(
-                            (approver) => approver.user_name === newInputValue
-                          );
-                          field.onChange(selectedApprover?._id || "");
+                      <Controller
+                        name="claim_end_date"
+                        control={control}
+                        rules={{
+                          required: "End date is required",
+                          validate: (value) => {
+                            const selectedProject = projects.find((p) => p._id === watch("project_id"));
+                            if (!selectedProject) return "Please select a project first";
+                            const projectEnd = moment(selectedProject.project_end_date);
+                            const projectStart = moment(selectedProject.project_start_date);
+                            const startDate = watch("claim_start_date");
+                            if (value && startDate && value.isBefore(startDate)) {
+                              return "End date cannot be before start date";
+                            }
+                            if (value && value.isAfter(projectEnd)) {
+                              return "End date cannot be after project end date";
+                            }
+                            if (value && value.isBefore(projectStart)) {
+                              return "End date cannot be before project start date";
+                            }
+                            return true;
+                          },
                         }}
-                        onChange={(_, newValue) => {
-                          const selectedApprover = approvers.find(
-                            (approver) => approver.user_name === newValue
-                          );
-                          field.onChange(selectedApprover?._id || "");
-                          setSelectedApproverName(newValue || "");
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Approver *"
-                            error={!!errors.approval_id}
-                            helperText={errors.approval_id?.message}
+                        render={({ field }) => (
+                          <DatePicker
+                            label="End Date *"
+                            value={field.value}
+                            onChange={(date) => field.onChange(date)}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: !!errors.claim_end_date,
+                                helperText: errors.claim_end_date?.message,
+                              },
+                            }}
                           />
                         )}
                       />
-                    </FormControl>
-                  )}
-                />
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
-                    <Controller
-                      name="claim_start_date"
-                      control={control}
-                      rules={{
-                        required: "Start date is required",
-                        validate: (value) => {
-                          const selectedProject = projects.find((p) => p._id === watch("project_id"));
-                          if (!selectedProject) return "Please select a project first";
-                          const projectStart = moment(selectedProject.project_start_date);
-                          const projectEnd = moment(selectedProject.project_end_date);
-                          if (value && value.isBefore(projectStart, "day")) {
-                            return "Start date cannot be before project start date";
-                          }
-                          if (value && value.isAfter(projectEnd, "day")) {
-                            return "Start date cannot be after project end date";
-                          }
-                          return true;
-                        },
-                      }}
-                      render={({ field }) => (
-                        <DatePicker
-                          label="Start Date *"
-                          value={field.value}
-                          onChange={(date) => field.onChange(date)}
-                          format="DD/MM/YYYY"
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              error: !!errors.claim_start_date,
-                              helperText: errors.claim_start_date?.message,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="claim_end_date"
-                      control={control}
-                      rules={{
-                        required: "End date is required",
-                        validate: (value) => {
-                          const selectedProject = projects.find((p) => p._id === watch("project_id"));
-                          if (!selectedProject) return "Please select a project first";
-                          const projectEnd = moment(selectedProject.project_end_date);
-                          const projectStart = moment(selectedProject.project_start_date);
-                          const startDate = watch("claim_start_date");
-                          if (value && startDate && value.isBefore(startDate)) {
-                            return "End date cannot be before start date";
-                          }
-                          if (value && value.isAfter(projectEnd)) {
-                            return "End date cannot be after project end date";
-                          }
-                          if (value && value.isBefore(projectStart)) {
-                            return "End date cannot be before project start date";
-                          }
-                          return true;
-                        },
-                      }}
-                      render={({ field }) => (
-                        <DatePicker
-                          label="End Date *"
-                          value={field.value}
-                          onChange={(date) => field.onChange(date)}
-                          format="DD/MM/YYYY"
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              error: !!errors.claim_end_date,
-                              helperText: errors.claim_end_date?.message,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                  </div>
-                </LocalizationProvider>
-                <Controller
-                  name="total_work_time"
-                  control={control}
-                  rules={{
-                    required: "Total work time is required",
-                    min: { value: 1, message: "Total work time must be positive" },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Total Times *"
-                      type="number"
-                      fullWidth
-                      margin="normal"
-                      error={!!errors.total_work_time}
-                      helperText={errors.total_work_time?.message}
-                    />
-                  )}
-                />
-                <DialogActions sx={{ p: 0, mt: 3 }}>
-                  <Button onClick={handleModalCancel} variant="outlined">
-                    Cancel
-                  </Button>
-                  <Button type="submit" variant="contained" color="primary">
-                    Add
-                  </Button>
-                </DialogActions>
-              </form>
+                    </div>
+                  </LocalizationProvider>
+                  <Controller
+                    name="total_work_time"
+                    control={control}
+                    rules={{
+                      required: "Total work time is required",
+                      min: { value: 1, message: "Total work time must be positive" },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Total Times *"
+                        type="number"
+                        fullWidth
+                        margin="normal"
+                        error={!!errors.total_work_time}
+                        helperText={errors.total_work_time?.message}
+                      />
+                    )}
+                  />
+                  <DialogActions sx={{ p: 0, mt: 3 }}>
+                    <Button onClick={handleModalCancel} variant="outlined" disabled={isAdding}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" variant="contained" color="primary" disabled={isAdding}>
+                      Add
+                    </Button>
+                  </DialogActions>
+                </form>
+              )}
             </DialogContent>
           </Dialog>
 
@@ -1384,205 +1457,213 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              <form onSubmit={handleSubmit(handleEditModalOk)}>
-                <Controller
-                  name="claim_name"
-                  control={control}
-                  rules={{ required: "Claim name is required" }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Request Name *"
-                      fullWidth
-                      margin="normal"
-                      error={!!errors.claim_name}
-                      helperText={errors.claim_name?.message}
-                    />
-                  )}
-                />
-                <Controller
-                  name="project_id"
-                  control={control}
-                  rules={{ required: "Project is required" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth margin="normal">
-                      <Autocomplete
-                        freeSolo
-                        options={projects.map((project) => project.project_name)}
-                        value={selectedProjectName || ""}
-                        onInputChange={(_, newInputValue) => {
-                          setSelectedProjectName(newInputValue);
-                          debouncedFetchProjects(newInputValue);
-                          const selectedProject = projects.find(
-                            (project) => project.project_name === newInputValue
-                          );
-                          field.onChange(selectedProject?._id || "");
+              {isEditing ? (
+                <div className="flex justify-center">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit(handleEditModalOk)}>
+                  <Controller
+                    name="claim_name"
+                    control={control}
+                    rules={{ required: "Claim name is required" }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Request Name *"
+                        fullWidth
+                        margin="normal"
+                        error={!!errors.claim_name}
+                        helperText={errors.claim_name?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    name="project_id"
+                    control={control}
+                    rules={{ required: "Project is required" }}
+                    render={({ field }) => (
+                      <FormControl fullWidth margin="normal">
+                        <Autocomplete
+                          freeSolo
+                          options={projects.map((project) => project.project_name)}
+                          value={selectedProjectName || ""}
+                          onInputChange={(_, newInputValue) => {
+                            setSelectedProjectName(newInputValue);
+                            debouncedFetchProjects(newInputValue);
+                            const selectedProject = projects.find(
+                              (project) => project.project_name === newInputValue
+                            );
+                            field.onChange(selectedProject?._id || "");
+                          }}
+                          onChange={(_, newValue) => {
+                            const selectedProject = projects.find(
+                              (project) => project.project_name === newValue
+                            );
+                            field.onChange(selectedProject?._id || "");
+                            setSelectedProjectName(newValue || "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Project Name *"
+                              error={!!errors.project_id}
+                              helperText={errors.project_id?.message}
+                              onChange={(e) => {
+                                debouncedFetchProjects(e.target.value);
+                              }}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <Controller
+                    name="approval_id"
+                    control={control}
+                    rules={{ required: "Approver is required" }}
+                    render={({ field }) => (
+                      <FormControl fullWidth margin="normal">
+                        <Autocomplete
+                          freeSolo
+                          options={approvers.map((approver) => approver.user_name)}
+                          value={selectedApproverName || ""}
+                          onInputChange={(_, newInputValue) => {
+                            setSelectedApproverName(newInputValue);
+                            debouncedFetchApprovers(newInputValue);
+                            const selectedApprover = approvers.find(
+                              (approver) => approver.user_name === newInputValue
+                            );
+                            field.onChange(selectedApprover?._id || "");
+                          }}
+                          onChange={(_, newValue) => {
+                            const selectedApprover = approvers.find(
+                              (approver) => approver.user_name === newValue
+                            );
+                            field.onChange(selectedApprover?._id || "");
+                            setSelectedApproverName(newValue || "");
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Approver *"
+                              error={!!errors.approval_id}
+                              helperText={errors.approval_id?.message}
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
+                      <Controller
+                        name="claim_start_date"
+                        control={control}
+                        rules={{
+                          required: "Start date is required",
+                          validate: (value) => {
+                            const selectedProject = projects.find((p) => p._id === watch("project_id"));
+                            if (!selectedProject) return "Please select a project first";
+                            const projectStart = moment(selectedProject.project_start_date);
+                            const projectEnd = moment(selectedProject.project_end_date);
+                            if (value && value.isBefore(projectStart, "day")) {
+                              return "Start date cannot be before project start date";
+                            }
+                            if (value && value.isAfter(projectEnd, "day")) {
+                              return "Start date cannot be after project end date";
+                            }
+                            return true;
+                          },
                         }}
-                        onChange={(_, newValue) => {
-                          const selectedProject = projects.find(
-                            (project) => project.project_name === newValue
-                          );
-                          field.onChange(selectedProject?._id || "");
-                          setSelectedProjectName(newValue || "");
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Project Name *"
-                            error={!!errors.project_id}
-                            helperText={errors.project_id?.message}
-                            onChange={(e) => {
-                              debouncedFetchProjects(e.target.value);
+                        render={({ field }) => (
+                          <DatePicker
+                            label="Start Date *"
+                            value={field.value}
+                            onChange={(date) => field.onChange(date)}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: !!errors.claim_start_date,
+                                helperText: errors.claim_start_date?.message,
+                              },
                             }}
                           />
                         )}
                       />
-                    </FormControl>
-                  )}
-                />
-                <Controller
-                  name="approval_id"
-                  control={control}
-                  rules={{ required: "Approver is required" }}
-                  render={({ field }) => (
-                    <FormControl fullWidth margin="normal">
-                      <Autocomplete
-                        freeSolo
-                        options={approvers.map((approver) => approver.user_name)}
-                        value={selectedApproverName || ""}
-                        onInputChange={(_, newInputValue) => {
-                          setSelectedApproverName(newInputValue);
-                          debouncedFetchApprovers(newInputValue);
-                          const selectedApprover = approvers.find(
-                            (approver) => approver.user_name === newInputValue
-                          );
-                          field.onChange(selectedApprover?._id || "");
+                      <Controller
+                        name="claim_end_date"
+                        control={control}
+                        rules={{
+                          required: "End date is required",
+                          validate: (value) => {
+                            const selectedProject = projects.find((p) => p._id === watch("project_id"));
+                            if (!selectedProject) return "Please select a project first";
+                            const projectEnd = moment(selectedProject.project_end_date);
+                            const projectStart = moment(selectedProject.project_start_date);
+                            const startDate = watch("claim_start_date");
+                            if (value && startDate && value.isBefore(startDate)) {
+                              return "End date cannot be before start date";
+                            }
+                            if (value && value.isAfter(projectEnd)) {
+                              return "End date cannot be after project end date";
+                            }
+                            if (value && value.isBefore(projectStart)) {
+                              return "End date cannot be before project start date";
+                            }
+                            return true;
+                          },
                         }}
-                        onChange={(_, newValue) => {
-                          const selectedApprover = approvers.find(
-                            (approver) => approver.user_name === newValue
-                          );
-                          field.onChange(selectedApprover?._id || "");
-                          setSelectedApproverName(newValue || "");
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            label="Approver *"
-                            error={!!errors.approval_id}
-                            helperText={errors.approval_id?.message}
+                        render={({ field }) => (
+                          <DatePicker
+                            label="End Date *"
+                            value={field.value}
+                            onChange={(date) => field.onChange(date)}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                              textField: {
+                                fullWidth: true,
+                                error: !!errors.claim_end_date,
+                                helperText: errors.claim_end_date?.message,
+                              },
+                            }}
                           />
                         )}
                       />
-                    </FormControl>
-                  )}
-                />
-                <LocalizationProvider dateAdapter={AdapterMoment}>
-                  <div style={{ display: "flex", gap: "16px", marginTop: "16px" }}>
-                    <Controller
-                      name="claim_start_date"
-                      control={control}
-                      rules={{
-                        required: "Start date is required",
-                        validate: (value) => {
-                          const selectedProject = projects.find((p) => p._id === watch("project_id"));
-                          if (!selectedProject) return "Please select a project first";
-                          const projectStart = moment(selectedProject.project_start_date);
-                          const projectEnd = moment(selectedProject.project_end_date);
-                          if (value && value.isBefore(projectStart, "day")) {
-                            return "Start date cannot be before project start date";
-                          }
-                          if (value && value.isAfter(projectEnd, "day")) {
-                            return "Start date cannot be after project end date";
-                          }
-                          return true;
-                        },
-                      }}
-                      render={({ field }) => (
-                        <DatePicker
-                          label="Start Date *"
-                          value={field.value}
-                          onChange={(date) => field.onChange(date)}
-                          format="DD/MM/YYYY"
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              error: !!errors.claim_start_date,
-                              helperText: errors.claim_start_date?.message,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="claim_end_date"
-                      control={control}
-                      rules={{
-                        required: "End date is required",
-                        validate: (value) => {
-                          const selectedProject = projects.find((p) => p._id === watch("project_id"));
-                          if (!selectedProject) return "Please select a project first";
-                          const projectEnd = moment(selectedProject.project_end_date);
-                          const projectStart = moment(selectedProject.project_start_date);
-                          const startDate = watch("claim_start_date");
-                          if (value && startDate && value.isBefore(startDate)) {
-                            return "End date cannot be before start date";
-                          }
-                          if (value && value.isAfter(projectEnd)) {
-                            return "End date cannot be after project end date";
-                          }
-                          if (value && value.isBefore(projectStart)) {
-                            return "End date cannot be before project start date";
-                          }
-                          return true;
-                        },
-                      }}
-                      render={({ field }) => (
-                        <DatePicker
-                          label="End Date *"
-                          value={field.value}
-                          onChange={(date) => field.onChange(date)}
-                          format="DD/MM/YYYY"
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              error: !!errors.claim_end_date,
-                              helperText: errors.claim_end_date?.message,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-                  </div>
-                </LocalizationProvider>
-                <Controller
-                  name="total_work_time"
-                  control={control}
-                  rules={{
-                    required: "Total work time is required",
-                    min: { value: 1, message: "Total work time must be positive" },
-                  }}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label="Total Times *"
-                      type="number"
-                      fullWidth
-                      margin="normal"
-                      error={!!errors.total_work_time}
-                      helperText={errors.total_work_time?.message}
-                    />
-                  )}
-                />
-                <DialogActions sx={{ p: 0, mt: 3 }}>
-                  <Button onClick={handleModalCancel} variant="outlined">
-                    Cancel
-                  </Button>
-                  <Button type="submit" variant="contained" color="primary">
-                    Save Changes
-                  </Button>
-                </DialogActions>
-              </form>
+                    </div>
+                  </LocalizationProvider>
+                  <Controller
+                    name="total_work_time"
+                    control={control}
+                    rules={{
+                      required: "Total work time is required",
+                      min: { value: 1, message: "Total work time must be positive" },
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Total Times *"
+                        type="number"
+                        fullWidth
+                        margin="normal"
+                        error={!!errors.total_work_time}
+                        helperText={errors.total_work_time?.message}
+                      />
+                    )}
+                  />
+                  <DialogActions sx={{ p: 0, mt: 3 }}>
+                    <Button onClick={handleModalCancel} variant="outlined" disabled={isEditing}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" variant="contained" color="primary" disabled={isEditing}>
+                      Save Changes
+                    </Button>
+                  </DialogActions>
+                </form>
+              )}
             </DialogContent>
           </Dialog>
 
@@ -1617,14 +1698,23 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              <p style={{ marginTop: "16px", fontSize: "1rem" }}>
-                Are you sure you want to submit this request for approval?
-              </p>
+              {isApproving ? (
+                <div className="flex justify-center">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : (
+                <p style={{ marginTop: "16px", fontSize: "1rem" }}>
+                  Are you sure you want to submit this request for approval?
+                </p>
+              )}
             </DialogContent>
             <DialogActions sx={{ p: 3 }}>
               <Button
                 onClick={() => setIsConfirmModalVisible(false)}
                 variant="outlined"
+                disabled={isApproving}
               >
                 Cancel
               </Button>
@@ -1632,6 +1722,7 @@ const RequestPage = () => {
                 onClick={handleConfirmApproval}
                 variant="contained"
                 color="primary"
+                disabled={isApproving}
               >
                 Confirm
               </Button>
@@ -1669,14 +1760,23 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              <p style={{ marginTop: "16px", fontSize: "1rem" }}>
-                Are you sure you want to cancel this request?
-              </p>
+              {isCanceling ? (
+                <div className="flex justify-center">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : (
+                <p style={{ marginTop: "16px", fontSize: "1rem" }}>
+                  Are you sure you want to cancel this request?
+                </p>
+              )}
             </DialogContent>
             <DialogActions sx={{ p: 3 }}>
               <Button
                 onClick={() => setIsDeleteModalVisible(false)}
                 variant="outlined"
+                disabled={isCanceling}
               >
                 Cancel
               </Button>
@@ -1684,6 +1784,7 @@ const RequestPage = () => {
                 onClick={handleConfirmCancel}
                 variant="contained"
                 color="error"
+                disabled={isCanceling}
               >
                 Confirm
               </Button>
@@ -1721,7 +1822,13 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              {claimLogs.length > 0 ? (
+              {isFetchingLogs ? (
+                <div className="flex justify-center">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : claimLogs.length > 0 ? (
                 <TableContainer component={Paper}>
                   <Table aria-label="claim logs table">
                     <TableHead>
@@ -1758,19 +1865,29 @@ const RequestPage = () => {
                               {log.new_status}
                             </TableCell>
                             <TableCell align="center" sx={tableCellStyle}>
-                              <Button
-                                variant="text"
-                                onClick={() => handleViewUserInfo(log.updated_by)}
-                                sx={{
-                                  textTransform: "none",
-                                  color: "#1976d2",
-                                  "&:hover": {
-                                    textDecoration: "underline",
-                                  },
-                                }}
-                              >
-                                {log.updated_by}
-                              </Button>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <Button
+                                  variant="text"
+                                  onClick={() => handleViewUserInfo(log.updated_by)}
+                                  sx={{
+                                    textTransform: "none",
+                                    color: "#1976d2",
+                                    "&:hover": {
+                                      textDecoration: "underline",
+                                    },
+                                  }}
+                                  disabled={loadingUser === log.updated_by}
+                                >
+                                  {log.updated_by}
+                                </Button>
+                                {loadingUser === log.updated_by && (
+                                  <div className="flex flex-row gap-1 ml-2">
+                                    <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce"></div>
+                                    <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                                    <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                                  </div>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell align="center" sx={tableCellStyle}>
                               {log.comment || "No comment provided"}
@@ -1788,6 +1905,7 @@ const RequestPage = () => {
               <Button
                 onClick={() => setIsLogModalVisible(false)}
                 variant="outlined"
+                disabled={isFetchingLogs}
               >
                 Close
               </Button>
@@ -1797,7 +1915,7 @@ const RequestPage = () => {
           {/* User Info Modal */}
           <Dialog
             open={isUserInfoModalVisible}
-            onClose={handleModalCancel}
+            onClose={handleCloseUserInfoModal}
             maxWidth="sm"
             fullWidth
           >
@@ -1813,7 +1931,7 @@ const RequestPage = () => {
               User Information
               <IconButton
                 aria-label="close"
-                onClick={handleModalCancel}
+                onClick={handleCloseUserInfoModal}
                 sx={{
                   position: "absolute",
                   right: 8,
@@ -1825,7 +1943,13 @@ const RequestPage = () => {
               </IconButton>
             </DialogTitle>
             <DialogContent sx={{ p: 3 }}>
-              {selectedUserInfo ? (
+              {isFetchingUserInfo ? (
+                <div className="flex justify-center">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : selectedUserInfo ? (
                 <div>
                   <TextField
                     label="User Name"
@@ -1848,8 +1972,9 @@ const RequestPage = () => {
             </DialogContent>
             <DialogActions sx={{ p: 3 }}>
               <Button
-                onClick={handleModalCancel}
+                onClick={handleCloseUserInfoModal}
                 variant="outlined"
+                disabled={isFetchingUserInfo}
               >
                 Close
               </Button>
