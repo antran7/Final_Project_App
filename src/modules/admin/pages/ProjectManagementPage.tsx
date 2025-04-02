@@ -107,7 +107,7 @@ const ProjectManagementPage: React.FC = () => {
   }, [page, rowsPerPage, debouncedSearchTerm]);
 
   useEffect(() => {
-    if (openDialog) {
+    if (openDialog && debouncedUserSearchTerm) {
       fetchUsers();
     }
   }, [openDialog, debouncedUserSearchTerm]);
@@ -294,17 +294,10 @@ const ProjectManagementPage: React.FC = () => {
 
   const handleUserSearch = (index: number, searchValue: string) => {
     setUserSearchTerm(searchValue);
-    setShowUserDropdown(index);
+    setShowUserDropdown(searchValue.trim() ? index : null);
 
-    if (searchValue.trim() === "") {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(
-        (user) =>
-          user.email.toLowerCase().includes(searchValue.toLowerCase()) ||
-          user.user_name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setFilteredUsers(filtered);
+    if (!searchValue.trim()) {
+      setFilteredUsers([]);
     }
   };
 
@@ -312,6 +305,7 @@ const ProjectManagementPage: React.FC = () => {
     handleMemberChange(index, "user_id", user._id);
     setShowUserDropdown(null);
     setUserSearchTerm("");
+    setFilteredUsers([]);
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -732,7 +726,7 @@ const ProjectManagementPage: React.FC = () => {
                             {getFieldError(formik, `project_members[${index}].user_id`)}
                           </p>
                         )}
-                        {showUserDropdown === index && (
+                        {showUserDropdown === index && userSearchTerm.trim() && (
                           <Paper
                             style={{
                               position: "absolute",
