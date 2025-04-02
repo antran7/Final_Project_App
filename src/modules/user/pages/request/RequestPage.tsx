@@ -20,6 +20,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
 } from "@mui/material";
 import axios from "axios";
 import { debounce } from "lodash";
@@ -35,7 +36,15 @@ import { useForm, Controller } from "react-hook-form";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { TableChart, PictureAsPdf } from "@mui/icons-material";
+import {
+  TableChart,
+  PictureAsPdf,
+  Edit as EditIcon,
+  Cancel as CancelIcon,
+  Send as SendIcon,
+  History as HistoryIcon,
+  Download as DownloadIcon,
+} from "@mui/icons-material";
 
 const API_URL = "https://management-claim-request.vercel.app/api";
 
@@ -136,13 +145,13 @@ const RequestPage = () => {
   const [isLogModalVisible, setIsLogModalVisible] = useState(false);
   const [currentRequest, setCurrentRequest] = useState<Request | null>(null);
   const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // General loading for initial fetch
-  const [isAdding, setIsAdding] = useState<boolean>(false); // Loading for adding
-  const [isEditing, setIsEditing] = useState<boolean>(false); // Loading for editing
-  const [isFetchingLogs, setIsFetchingLogs] = useState<boolean>(false); // Loading for logs
-  const [isApproving, setIsApproving] = useState<boolean>(false); // Loading for approval
-  const [isCanceling, setIsCanceling] = useState<boolean>(false); // Loading for canceling
-  const [isOpeningModal, setIsOpeningModal] = useState<boolean>(false); // Loading for opening Add Request Modal
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isFetchingLogs, setIsFetchingLogs] = useState<boolean>(false);
+  const [isApproving, setIsApproving] = useState<boolean>(false);
+  const [isCanceling, setIsCanceling] = useState<boolean>(false);
+  const [isOpeningModal, setIsOpeningModal] = useState<boolean>(false);
   const [selectedApproverName, setSelectedApproverName] = useState<string>("");
   const [selectedProjectName, setSelectedProjectName] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
@@ -159,8 +168,8 @@ const RequestPage = () => {
   const [selectedRequestForDownload, setSelectedRequestForDownload] = useState<Request | null>(null);
   const [isUserInfoModalVisible, setIsUserInfoModalVisible] = useState(false);
   const [selectedUserInfo, setSelectedUserInfo] = useState<Approver | null>(null);
-  const [isFetchingUserInfo, setIsFetchingUserInfo] = useState<boolean>(false); // Loading for user info
-  const [loadingUser, setLoadingUser] = useState<string | null>(null); // Track which user is being loaded
+  const [isFetchingUserInfo, setIsFetchingUserInfo] = useState<boolean>(false);
+  const [loadingUser, setLoadingUser] = useState<string | null>(null);
 
   const {
     control,
@@ -405,7 +414,7 @@ const RequestPage = () => {
   };
 
   const fetchUserInfo = async (username: string) => {
-    setLoadingUser(username); // Set the user being loaded
+    setLoadingUser(username);
     setIsFetchingUserInfo(true);
     try {
       console.log("Searching for user with username:", username);
@@ -434,7 +443,6 @@ const RequestPage = () => {
         const userId = searchResponse.data.data.pageData[0]._id;
         console.log("Found userId:", userId);
 
-        // Giả lập độ trễ để thấy loading (có thể bỏ sau khi kiểm tra)
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const response = await axios.get(`${API_URL}/users/${userId}`, {
@@ -463,7 +471,7 @@ const RequestPage = () => {
       }
     } finally {
       setIsFetchingUserInfo(false);
-      setLoadingUser(null); // Reset loading user
+      setLoadingUser(null);
     }
   };
 
@@ -484,9 +492,7 @@ const RequestPage = () => {
   const handleOpenAddModal = async () => {
     setIsOpeningModal(true);
     try {
-      // Giả lập độ trễ để thấy loading (có thể bỏ sau khi kiểm tra)
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Đảm bảo dữ liệu projects và approvers đã được fetch trước khi mở modal
       await Promise.all([ensureProjectsFetched(), ensureApproversFetched()]);
       setIsAddModalVisible(true);
     } catch (error) {
@@ -520,7 +526,6 @@ const RequestPage = () => {
 
       console.log("Submitting newRequest:", newRequest);
 
-      // Thêm độ trễ giả lập để kiểm tra loading (có thể bỏ sau khi xác nhận loading hoạt động)
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const response = await axios.post(`${API_URL}/claims`, newRequest, {
@@ -745,7 +750,6 @@ const RequestPage = () => {
   const handleCloseUserInfoModal = () => {
     setIsUserInfoModalVisible(false);
     setSelectedUserInfo(null);
-    // Không đóng modal Claim Logs, chỉ reset thông tin user
   };
 
   const handleRequestCancel = async (id: string) => {
@@ -1057,87 +1061,51 @@ const RequestPage = () => {
                           align="center"
                           sx={{ ...tableCellStyle, minWidth: "300px" }}
                         >
-                          <div className="action-buttons">
+                          <div className="action-buttons" style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                             {(req.claim_status === "Draft" || req.claim_status === "Returned") && (
                               <>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => handleEditClick(req)}
-                                  sx={{
-                                    backgroundColor: "#e6cb62",
-                                    color: "black",
-                                    "&:hover": {
-                                      backgroundColor: "#eab308",
-                                      color: "white",
-                                    },
-                                    mr: 1,
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => handleRequestCancel(req._id)}
-                                  sx={{
-                                    backgroundColor: "#dc2626",
-                                    color: "white",
-                                    "&:hover": {
-                                      backgroundColor: "#ef4444",
-                                    },
-                                    mr: 1,
-                                  }}
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  size="small"
-                                  onClick={() => handleRequestApproval(req._id)}
-                                  sx={{
-                                    backgroundColor: "#46d179",
-                                    color: "white",
-                                    "&:hover": {
-                                      backgroundColor: "#16a34a",
-                                    },
-                                    mr: 1,
-                                  }}
-                                >
-                                  Request Approval
-                                </Button>
+                                <Tooltip title="Edit">
+                                  <IconButton
+                                    onClick={() => handleEditClick(req)}
+                                    sx={{ color: "#e6cb62", "&:hover": { color: "#eab308" } }}
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Cancel">
+                                  <IconButton
+                                    onClick={() => handleRequestCancel(req._id)}
+                                    sx={{ color: "#dc2626", "&:hover": { color: "#ef4444" } }}
+                                  >
+                                    <CancelIcon />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Request Approval">
+                                  <IconButton
+                                    onClick={() => handleRequestApproval(req._id)}
+                                    sx={{ color: "#46d179", "&:hover": { color: "#16a34a" } }}
+                                  >
+                                    <SendIcon />
+                                  </IconButton>
+                                </Tooltip>
                               </>
                             )}
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() => handleViewLogs(req._id)}
-                              sx={{
-                                borderColor: "#6b7280",
-                                color: "#6b7280",
-                                "&:hover": {
-                                  borderColor: "#374151",
-                                  color: "#374151",
-                                },
-                              }}
-                            >
-                              View Logs
-                            </Button>
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={(e) => handleDownloadClick(e, req)}
-                              sx={{
-                                backgroundColor: "#3b82f6",
-                                color: "white",
-                                "&:hover": {
-                                  backgroundColor: "#2563eb",
-                                },
-                                mr: 1,
-                              }}
-                            >
-                              Download
-                            </Button>
+                            <Tooltip title="View Logs">
+                              <IconButton
+                                onClick={() => handleViewLogs(req._id)}
+                                sx={{ color: "#6b7280", "&:hover": { color: "#374151" } }}
+                              >
+                                <HistoryIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Download">
+                              <IconButton
+                                onClick={(e) => handleDownloadClick(e, req)}
+                                sx={{ color: "#3b82f6", "&:hover": { color: "#2563eb" } }}
+                              >
+                                <DownloadIcon />
+                              </IconButton>
+                            </Tooltip>
                             <Menu
                               anchorEl={downloadAnchorEl}
                               open={Boolean(downloadAnchorEl)}
