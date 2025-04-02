@@ -128,7 +128,7 @@
     border-radius: 30px;
     font-family: 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 5px 15px 5px 10px;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -148,9 +148,25 @@
 .login-carousel {
     width: 90%;
     height: 100%;
-    right: 0;
     position: absolute;
+    right: -30px;
     z-index: 0;
+    border-radius: 20px;
+
+    .swiper-pagination-bullet {
+        width: 30px;
+        height: 5px;
+        border-radius: 5px;
+        background: #fff;
+        opacity: 0.5;
+        transition: opacity 0.3s;
+    }
+    
+    .swiper-pagination-bullet-active {
+        opacity: 1;
+        background: #fff;
+        width: 45px;
+    }
 }
 
 .login-checkbox {
@@ -170,21 +186,6 @@
     color: #fff !important;
 }
 
-.swiper-pagination-bullet {
-    width: 30px;
-    height: 5px;
-    border-radius: 5px;
-    background: #fff;
-    opacity: 0.5;
-    transition: opacity 0.3s;
-}
-
-.swiper-pagination-bullet-active {
-    opacity: 1;
-    background: #fff;
-    width: 45px;
-}
-
 .login-slogan {
     position: absolute;
     left: 30%;
@@ -194,7 +195,7 @@
     font-weight: lighter;
     font-size: 35px;
     padding-left: 15px;
-    z-index: 1;
+    z-index: 2;
 }
 
 .forgot-password-form {
