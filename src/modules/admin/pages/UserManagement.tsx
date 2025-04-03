@@ -201,8 +201,6 @@ const UserManagement = () => {
         { keyword: searchTerm.trim() },
         { pageNum, pageSize }
       );
-      console.log("Users type check:", Array.isArray(response.pageData)); // Should be true
-      console.log("Parsed Users:", response.pageData); //  Debug users
       if (response?.pageData && response?.pageInfo) {
         setUsers(response.pageData); //  Correctly setting users
         setTotalPages(response.pageInfo.totalPages || 1); //  Fix pagination
@@ -288,6 +286,7 @@ const UserManagement = () => {
         );
       } else if (confirmDialog.action === "delete") {
         await deleteUser(confirmDialog.user._id);
+        toast.success("User deleted successfully!");
         fetchUsers();
       }
     } catch (error) {
@@ -299,18 +298,14 @@ const UserManagement = () => {
   };
 
   const handleOpenEmployeeDetails = async (id: string) => {
-    console.log("Fetching details for User ID:", id);
-
+    setLoading(true);
     if (!id) {
       toast.error("Invalid User ID");
       return;
     }
 
     try {
-      const employee = await getEmployeeById(id); // Now TypeScript knows `employee` has all properties
-    
-      console.log("Fixed Response Data:", employee);
-    
+      const employee = await getEmployeeById(id); 
       if (!employee || Object.keys(employee).length === 0) {
         throw new Error("No employee data found");
       }
@@ -339,13 +334,14 @@ const UserManagement = () => {
     } catch (error) {
       console.error("Error fetching employee details:", error);
       toast.error(error instanceof Error ? error.message : "Error fetching employee details");
+    } finally {
+      setLoading(false); 
     }
   };
 
   const handleSaveEmployeeDetails = async () => {
+    setLoading(true);
     try {
-      console.log("Sending to API:", employeeData);
-  
       // Validate the payload
       if (!employeeData.user_id || !employeeData.job_rank || !employeeData.contract_type) {
         throw new Error("Missing required fields in employee data");
@@ -371,7 +367,7 @@ const UserManagement = () => {
       await updateEmployee(employeeData.user_id, employeePayload);
   
       toast.success("Employee updated successfully!");
-      setPopupOpen2(false); // Close the dialog after successful update
+      setPopupOpen2(false); 
     } catch (error) {
       console.error("Error updating employee details:", error);
       toast.error(
@@ -379,6 +375,8 @@ const UserManagement = () => {
           ? error.message
           : "Error updating employee details"
       );
+    } finally {
+      setLoading(false); 
     }
   };
   
@@ -399,7 +397,6 @@ const UserManagement = () => {
       );
       toast.success("User role updated successfully!");
     } catch (error) {
-      console.error("Error updating role:", error);
       toast.error(`Error updating role: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false); // Set loading to false
@@ -415,9 +412,7 @@ const UserManagement = () => {
           fetchDepartments(),
           fetchContracts()
         ]);
-        
-        console.log('Raw API responses:', { jobRanksData, departmentsData, contractsData });
-        
+  
         // Extract the actual job rank values from the response based on the response structure
         const processJobRanks = (data: JobRankResponse): string[] => {
           // Check if the API response has the expected structure
@@ -1027,16 +1022,16 @@ const UserManagement = () => {
                         }
                         sx={{
                           textAlign: "center",
-                          textTransform: "none", // Không viết hoa chữ
-                          borderRadius: "12px", // Bo tròn góc
-                          fontWeight: 600, // Chữ đậm
+                          textTransform: "none", 
+                          borderRadius: "12px", 
+                          fontWeight: 600, 
                           backgroundColor: user.is_blocked
                             ? "#FF3B30"
                             : "#34C759",
                           "&:hover": {
                             backgroundColor: user.is_blocked
                               ? "#D32F2F"
-                              : "#2E7D32", // Màu khi hover
+                              : "#2E7D32", 
                           },
                         }}
                       >
@@ -1058,7 +1053,7 @@ const UserManagement = () => {
                             user_name: user.user_name,
                             role_code: user.role_code,
                           });
-                          setPopupOpen(true); // Open popup
+                          setPopupOpen(true); 
                         }}
                       >
                         <Pencil size={18} />
@@ -1079,7 +1074,7 @@ const UserManagement = () => {
 
                       <Button
                         onClick={() => {
-                          console.log("Selected User ID:", user._id); // ✅ Check if user.id exists
+                          console.log("Selected User ID:", user._id); // Check if user.id exists
                           handleOpenEmployeeDetails(user._id);
                         }}
                       >
