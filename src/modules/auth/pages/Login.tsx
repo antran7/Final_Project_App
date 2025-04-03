@@ -21,7 +21,6 @@ interface LoginFormInputs {
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingForgot, setIsLoadingForgot] = useState(false);
   const [index, setIndex] = useState(0);
   const [animation, setAnimation] = useState("animate__fadeIn");
   const [showPassword, setShowPassword] = useState(false);
@@ -55,10 +54,10 @@ const Login: React.FC = () => {
   };
 
   const handleForgotPasswordClick = () => {
-    setIsLoadingForgot(true);
+    setIsLoading(true);
     setTimeout(() => {
       setToggleForm(true);
-      setIsLoadingForgot(false);
+      setIsLoading(false);
     }, 1000);
   };
 
@@ -123,7 +122,7 @@ const Login: React.FC = () => {
     <div className="login-page">
       <div className="login-container">
         {
-          isLoadingForgot ? (
+          isLoading ? (
             <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm z-50">
               <div className="flex gap-2">
                 <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
@@ -224,7 +223,7 @@ const Login: React.FC = () => {
                     },
                   }}
                 >
-                  {isLoading ? <CircularProgress size={28} thickness={5} /> : "Sign in"}
+                  Sign in
                 </Button>
               </form>
             </div>

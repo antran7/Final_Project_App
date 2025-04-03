@@ -30,6 +30,7 @@ interface SearchFormInputs {
 const ViewProject: React.FC = () => {
     const [alignment, setAlignment] = React.useState('basic');
     const [loading, setLoading] = React.useState(true);
+    const [loadingDetail, setLoadingDetail] = useState(false);
     const [results, setResults] = React.useState<ProjectData[]>([]);
     const [curPage, setCurPage] = React.useState(1);
     const [totalPages, setTotalPages] = React.useState(1);
@@ -73,7 +74,12 @@ const ViewProject: React.FC = () => {
     };
 
     const showProject = (projectId: string) => {
-        setOpenProjectId(projectId);
+        setLoadingDetail(true);
+        const randomDelay = Math.random() * (2000 - 1000) + 1000;
+        setTimeout(() => {
+            setOpenProjectId(projectId);
+            setLoadingDetail(false);
+        }, randomDelay);
     }
 
     const handleCloseProject = () => {
@@ -171,17 +177,6 @@ const ViewProject: React.FC = () => {
                 setTotalItems(response.pageInfo.totalItems);
                 setResults(response.pageData);
             }
-            // results.map((project) => {
-            //     project.project_members.map(async (member) => {
-            //         const employeeInfo = await getEmployeeInfo(member.user_id);
-            //         if (employeeInfo && employeeInfo.avatar_url) {
-            //             member.avatar_url = employeeInfo.avatar_url;
-            //         } else {
-            //             member.avatar_url = "";
-            //         }
-            //         console.log(member.avatar_url);
-            //     })
-            // })
         } catch (error) {
             console.error("Error: ", error);
         } finally {
@@ -195,6 +190,16 @@ const ViewProject: React.FC = () => {
 
     return (
         <Layout>
+            {
+                loadingDetail ? (
+                    <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm z-50">
+                        <div className="flex gap-2">
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
+                        </div>
+                    </div>
+                ) : null}
             <div className='search-projects-container'>
                 <div className='search-bar-input'>
                     <Search onSearch={handleSearch} />
@@ -315,7 +320,7 @@ const ViewProject: React.FC = () => {
                         <TableHead sx={{ "& th": { fontSize: "18px", color: "#040938" } }}>
                             <TableRow>
                                 <TableCell sx={{ width: "5%" }}>No.</TableCell>
-                                <TableCell sx={{ width: "15%" }}>
+                                <TableCell sx={{ width: "20%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_name")}
@@ -341,7 +346,7 @@ const ViewProject: React.FC = () => {
                                         Project Code
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%" }}>
+                                <TableCell sx={{ width: "15%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_start_date")}
@@ -354,7 +359,7 @@ const ViewProject: React.FC = () => {
                                         Start Date
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%" }}>
+                                <TableCell sx={{ width: "15%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_end_date")}
@@ -367,10 +372,9 @@ const ViewProject: React.FC = () => {
                                         End Date
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%", textAlign: "center" }}>Status</TableCell>
-                                <TableCell sx={{ width: "20%", textAlign: "center" }}>Members</TableCell>
+                                <TableCell sx={{ width: "10%" }}>Status</TableCell>
                                 <TableCell sx={{ width: "10%" }}>Last updated</TableCell>
-                                <TableCell sx={{ width: "5%" }}></TableCell>
+                                <TableCell sx={{ width: "10%" }}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -407,21 +411,11 @@ const ViewProject: React.FC = () => {
                                                 variant="body2"
                                                 sx={{
                                                     color: statusColors[project.project_status] || "black",
-                                                    textAlign: "center",
+                                                    fontWeight: "bold",
                                                 }}
                                             >
                                                 {project.project_status}
                                             </Typography>
-                                        </TableCell>
-                                        <TableCell sx={{ display: "flex", justifyContent: "center" }}>
-                                            {/* <AvatarGroup
-                                                total={project.project_members.length}
-                                            >
-                                                {project.project_members.map((member) => (
-                                                    <Avatar src={member.avatar_url} />
-                                                ))}
-                                            </AvatarGroup> */}
-                                            Members
                                         </TableCell>
                                         <TableCell>{formatDateWithRelative(project.updated_at)}</TableCell>
                                         <TableCell>

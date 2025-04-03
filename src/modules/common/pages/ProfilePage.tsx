@@ -36,7 +36,6 @@ const ProfilePage: React.FC = () => {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [updateAvatarLoading, setUpdateAvatarLoading] = useState(false);
-  const [updateEmployeeLoading, setUploadEmployeeLoading] = useState(false);
   const [isPasswordMode, setIsPasswordMode] = useState(false);
   const [myProjects, setMyProjects] = useState<ProjectData[]>([]);
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
@@ -133,7 +132,12 @@ const ProfilePage: React.FC = () => {
   }
 
   const showProject = (projectId: string) => {
-    setOpenProjectId(projectId);
+    setIsLoading(true);
+    const randomDelay = Math.random() * (2000 - 1000) + 1000;
+    setTimeout(() => {
+      setOpenProjectId(projectId);
+      setIsLoading(false);
+    }, randomDelay);
   }
 
   const handleCloseProject = () => {
@@ -194,8 +198,8 @@ const ProfilePage: React.FC = () => {
   };
 
   const onSubmitEmployeeData = async (data: EmployeeFormData) => {
-    if (updateEmployeeLoading) return;
-    setUploadEmployeeLoading(true);
+    if (isLoading) return;
+    setIsLoading(true);
 
     console.log("Submit Employee data: ", data);
     const updatedData = {
@@ -215,7 +219,7 @@ const ProfilePage: React.FC = () => {
         icon: "❌",
       });
     } finally {
-      setUploadEmployeeLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -307,6 +311,16 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Layout>
+      {
+        isLoading ? (
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm z-50">
+            <div className="flex gap-2">
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
+            </div>
+          </div>
+        ) : null}
       <div className='profile-page-container'>
         <div className='profile-page-title'>
           <h2>My profile info</h2>
@@ -475,8 +489,8 @@ const ProfilePage: React.FC = () => {
                       </>
                     )}
                     <button type="submit">
-                      {isLoading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> :
-                        (isPasswordMode ? "Update Password" : "Update Profile")
+                      {
+                        isPasswordMode ? "Update Password" : "Update Profile"
                       }
                     </button>
                   </form>
@@ -591,7 +605,7 @@ const ProfilePage: React.FC = () => {
                         width: "50%",
                       }}>
                         <button type='submit'>
-                          {updateEmployeeLoading ? <CircularProgress size={24} /> : "Update Info"}
+                          Update Info
                         </button>
                       </div>
                     </div>
