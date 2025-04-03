@@ -79,7 +79,7 @@ const ProjectDetail = () => {
   }, [projectId]);
 
   useEffect(() => {
-    if (editDialogOpen) {
+    if (editDialogOpen && debouncedUserSearchTerm) {
       fetchUsers();
     }
   }, [editDialogOpen, debouncedUserSearchTerm]);
@@ -93,6 +93,12 @@ const ProjectDetail = () => {
     project_end_date: Yup.date()
       .required("End date is required")
       .min(Yup.ref("project_start_date"), "End date must be after start date"),
+    project_members: Yup.array().of(
+      Yup.object().shape({
+        user_id: Yup.string().required("User is required"),
+        project_role: Yup.string().required("Role is required"),
+      })
+    ),
   });
 
   const formik = useFormik({
@@ -236,17 +242,10 @@ const ProjectDetail = () => {
 
   const handleUserSearch = (index: number, searchValue: string) => {
     setUserSearchTerm(searchValue);
-    setShowUserDropdown(index);
+    setShowUserDropdown(searchValue.trim() ? index : null);
 
-    if (searchValue.trim() === "") {
-      setFilteredUsers(users);
-    } else {
-      const filtered = users.filter(
-        (user) =>
-          user.email.toLowerCase().includes(searchValue.toLowerCase()) ||
-          user.user_name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setFilteredUsers(filtered);
+    if (!searchValue.trim()) {
+      setFilteredUsers([]);
     }
   };
 
@@ -254,6 +253,7 @@ const ProjectDetail = () => {
     handleMemberChange(index, "user_id", user._id);
     setShowUserDropdown(null);
     setUserSearchTerm("");
+    setFilteredUsers([]);
   };
 
   const handleStatusChange = async () => {
@@ -702,7 +702,7 @@ const ProjectDetail = () => {
                           ),
                         }}
                       />
-                      {showUserDropdown === index && (
+                      {showUserDropdown === index && userSearchTerm.trim() && (
                         <Paper
                           style={{
                             position: "absolute",
