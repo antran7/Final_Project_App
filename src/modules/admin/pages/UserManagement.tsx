@@ -369,6 +369,15 @@ const UserManagement = () => {
         throw new Error("Missing required fields in employee data");
       }
 
+      // Validate end date is after start date
+      if (employeeData.end_date && employeeData.start_date) {
+        if (employeeData.end_date < employeeData.start_date) {
+          toast.error("End date must be after start date");
+          setLoading(false);
+          return;
+        }
+      }
+
       // Prepare employee data with all fields from the requirements
       const employeePayload = {
         user_id: employeeData.user_id,
