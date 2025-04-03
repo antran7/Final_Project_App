@@ -15,11 +15,33 @@
     backdrop-filter: blur(10px);
     color: #fff;
     transition: backdrop-filter 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+    .account-icon {
+        color: #fff;
+    }
+}
+
+.layout-header.home-page {
+    .layout-header-right {
+        color: #fff;
+    }
+
+    .account-icon {
+        color: #fff;
+    }
 }
 
 .layout-header:hover {
     background: linear-gradient(to right, #00093c, #2d0b00);
     color: #fff;
+
+    .account-icon {
+        color: #fff;
+    }
+}
+
+.account-icon {
+    color: #000;
 }
 
 .layout-header-left {
@@ -34,7 +56,6 @@
     display: flex;
     align-items: center;
     width: 350px;
-    color: #fff;
 }
 
 .header-right-item {
