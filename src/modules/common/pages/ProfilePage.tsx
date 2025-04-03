@@ -17,6 +17,7 @@ import { Employee, EmployeeData } from '../../admin/types/user';
 import ProjectInfo from '../components/ProjectInfo';
 import { ProjectData } from '../constants/projectData';
 import { formatDateToUTC7 } from '../services/dateFormat';
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 type FormData = {
   username?: string;
@@ -37,6 +38,8 @@ const ProfilePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [updateAvatarLoading, setUpdateAvatarLoading] = useState(false);
   const [isPasswordMode, setIsPasswordMode] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [myProjects, setMyProjects] = useState<ProjectData[]>([]);
   const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const [pageNum, setPageNum] = useState(1);
@@ -182,6 +185,9 @@ const ProfilePage: React.FC = () => {
       try {
         await updateEmployee(user._id, updatedData);
         setEmployeeData(updatedData);
+        if (employee) {
+          employee.avatar_url = employeeData.avatar_url;
+        }
         toast("Upload avatar successfully.", {
           icon: "✅",
         });
@@ -233,15 +239,15 @@ const ProfilePage: React.FC = () => {
           new_password: data.newPassword || '',
         });
       } else {
-        await updateInfo(user?._id, {
+        const response = await updateInfo(user?._id, {
           email: data.email || '',
           user_name: data.username || ''
         });
+        localStorage.setItem("userData", JSON.stringify(response));
       }
       toast("Update successfully.", {
         icon: "✅",
       });
-      reset();
     } catch (error: any) {
       toast(error.toString(), {
         icon: "❌",
@@ -334,7 +340,7 @@ const ProfilePage: React.FC = () => {
                   <MUIAvatar
                     alt="Remy Sharp"
                     className='profile-avatar'
-                    src={employee.avatar_url || "https://via.placeholder.com/150"}
+                    src={employeeData.avatar_url || "https://via.placeholder.com/150"}
                     onClick={() => setOpenDialog(true)}
                   />
                   <Dialog open={openDialog} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -453,18 +459,54 @@ const ProfilePage: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <input
-                          type="password"
-                          {...registerUser('oldPassword', { required: 'Old password is required' })}
-                          placeholder="Enter old password"
-                        />
+                        <div style={{ position: "relative", width: "100%" }}>
+                          <input
+                            type={showOldPassword ? "text" : "password"}
+                            {...registerUser("oldPassword", { required: "Old password is required" })}
+                            placeholder="Enter old password"
+                            style={{ width: "100%", paddingRight: "40px" }}
+                          />
+                          <span
+                            onClick={() => setShowOldPassword(!showOldPassword)}
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "60%",
+                              transform: "translateY(-50%)",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {
+                              showOldPassword ? <VisibilityOff sx={{ color: "#CCCCCC" }} />
+                                : <Visibility sx={{ color: "#CCCCCC" }} />
+                            }
+                          </span>
+                        </div>
                         {errorsUser.oldPassword && <p style={{ color: 'red' }}>{errorsUser.oldPassword.message}</p>}
 
-                        <input
-                          type="password"
-                          {...registerUser('newPassword', { required: 'New password is required' })}
-                          placeholder="Enter new password"
-                        />
+                        <div style={{ position: "relative", width: "100%", marginTop: "10px" }}>
+                          <input
+                            type={showNewPassword ? "text" : "password"}
+                            {...registerUser("newPassword", { required: "New password is required" })}
+                            placeholder="Enter new password"
+                            style={{ width: "100%", paddingRight: "40px" }}
+                          />
+                          <span
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            style={{
+                              position: "absolute",
+                              right: "10px",
+                              top: "60%",
+                              transform: "translateY(-50%)",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {
+                              showNewPassword ? <VisibilityOff sx={{ color: "#CCCCCC" }} />
+                                : <Visibility sx={{ color: "#CCCCCC" }} />
+                            }
+                          </span>
+                        </div>
                         {errorsUser.newPassword && <p style={{ color: 'red' }}>{errorsUser.newPassword.message}</p>}
                         <div className='activate-info'>
                           <p>Is activate</p>
