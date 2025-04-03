@@ -14,9 +14,13 @@ interface UserData {
     "token_version": number
 }
 
-export const updateInfo = async (_id: string, updateData: { email: string; user_name: string }): Promise<void> => {
+export const updateInfo = async (_id: string, updateData: { email: string; user_name: string }): Promise<UserData> => {
     try {
-        await apiService.put<UserData>(`/users/${_id}`, updateData)
+        const response = await apiService.put<UserData>(`/users/${_id}`, updateData)
+        if (!response.data) {
+            throw new Error("No data received from API");
+        }
+        return response.data;
     } catch (error) {
         console.error("Error: ", error);
         throw error;
