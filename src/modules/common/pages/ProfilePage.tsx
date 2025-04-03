@@ -14,6 +14,9 @@ import { useDropzone } from "react-dropzone";
 import Cropper from "react-easy-crop";
 import { getEmployeeById, updateEmployee } from '../../admin/services/userService';
 import { Employee, EmployeeData } from '../../admin/types/user';
+import ProjectInfo from '../components/ProjectInfo';
+import { ProjectData } from '../constants/projectData';
+import { formatDateToUTC7 } from '../services/dateFormat';
 
 type FormData = {
   username?: string;
@@ -28,37 +31,14 @@ type EmployeeFormData = {
   address: string;
 };
 
-interface ProjectData {
-  _id: string,
-  project_name: string,
-  project_code: string,
-  project_department: string,
-  project_description: string,
-  project_status: string,
-  project_start_date: string,
-  project_end_date: string,
-  updated_by: string,
-  is_deleted: boolean,
-  created_at: string,
-  updated_at: string,
-  project_comment: string | null,
-  project_members: {
-    project_code: string,
-    user_id: string,
-    employee_id: string,
-    user_name: string,
-    full_name: string,
-  }[];
-}
-
 const ProfilePage: React.FC = () => {
   const user = JSON.parse(localStorage.getItem("userData") || "{}");
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [updateAvatarLoading, setUpdateAvatarLoading] = useState(false);
-  const [updateEmployeeLoading, setUploadEmployeeLoading] = useState(false);
   const [isPasswordMode, setIsPasswordMode] = useState(false);
   const [myProjects, setMyProjects] = useState<ProjectData[]>([]);
+  const [openProjectId, setOpenProjectId] = useState<string | null>(null);
   const [pageNum, setPageNum] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -100,15 +80,6 @@ const ProfilePage: React.FC = () => {
   const handleSwitchChange = () => {
     setIsPasswordMode((prev) => !prev);
     reset();
-  };
-
-  // Chuyển đổi ngày giờ
-  const formatDateToUTC7 = (date?: Date | string | null): string => {
-    if (!date) return "N/A";
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString("vi-VN", {
-      timeZone: "Asia/Ho_Chi_Minh",
-    });
   };
 
   // Hàm cắt ảnh
@@ -158,6 +129,19 @@ const ProfilePage: React.FC = () => {
 
   const handleClose = () => {
     setOpenDialog(false);
+  }
+
+  const showProject = (projectId: string) => {
+    setIsLoading(true);
+    const randomDelay = Math.random() * (2000 - 1000) + 1000;
+    setTimeout(() => {
+      setOpenProjectId(projectId);
+      setIsLoading(false);
+    }, randomDelay);
+  }
+
+  const handleCloseProject = () => {
+    setOpenProjectId(null);
   }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -214,8 +198,8 @@ const ProfilePage: React.FC = () => {
   };
 
   const onSubmitEmployeeData = async (data: EmployeeFormData) => {
-    if (updateEmployeeLoading) return;
-    setUploadEmployeeLoading(true);
+    if (isLoading) return;
+    setIsLoading(true);
 
     console.log("Submit Employee data: ", data);
     const updatedData = {
@@ -235,7 +219,7 @@ const ProfilePage: React.FC = () => {
         icon: "❌",
       });
     } finally {
-      setUploadEmployeeLoading(false);
+      setIsLoading(false);
     }
   }
 
@@ -327,6 +311,16 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Layout>
+      {
+        isLoading ? (
+          <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm z-50">
+            <div className="flex gap-2">
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
+              <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
+            </div>
+          </div>
+        ) : null}
       <div className='profile-page-container'>
         <div className='profile-page-title'>
           <h2>My profile info</h2>
@@ -495,8 +489,8 @@ const ProfilePage: React.FC = () => {
                       </>
                     )}
                     <button type="submit">
-                      {isLoading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> :
-                        (isPasswordMode ? "Update Password" : "Update Profile")
+                      {
+                        isPasswordMode ? "Update Password" : "Update Profile"
                       }
                     </button>
                   </form>
@@ -611,7 +605,7 @@ const ProfilePage: React.FC = () => {
                         width: "50%",
                       }}>
                         <button type='submit'>
-                          {updateEmployeeLoading ? <CircularProgress size={24} /> : "Update Info"}
+                          Update Info
                         </button>
                       </div>
                     </div>
@@ -689,7 +683,17 @@ const ProfilePage: React.FC = () => {
                           primary={project.project_name}
                           secondary={`Code: ${project.project_code}`}
                         />
-                        <Button className='view-project-btn'>View detail</Button>
+                        <Button
+                          className='view-project-btn'
+                          onClick={() => showProject(project._id)}
+                        >
+                          View detail
+                        </Button>
+                        <ProjectInfo
+                          isOpen={openProjectId === project._id}
+                          handleClose={handleCloseProject}
+                          project={project}
+                        />
                       </ListItem>
                     ))}
                   </List>

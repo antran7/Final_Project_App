@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import './ViewProject.css'
 import Layout from '../../../shared/layouts/Layout'
 import Search from '../../../shared/components/searchComponent/Search'
-import { Autocomplete, Button, Grid, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Autocomplete, Button, Grid, IconButton, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useForm } from 'react-hook-form'
@@ -12,6 +12,10 @@ import { debounce } from "lodash";
 import Footer from '../../../shared/components/layoutComponent/Footer'
 import { searchUsers } from '../../admin/services/userService'
 import { User } from '../../admin/types/user'
+import { formatDateWithRelative } from '../services/dateFormat'
+import { statusColors } from '../constants/statusColor'
+import ProjectInfo from '../components/ProjectInfo'
+import { ProjectData } from '../constants/projectData'
 
 
 interface SearchFormInputs {
@@ -21,34 +25,12 @@ interface SearchFormInputs {
     user_id: string;
 }
 
-interface ProjectData {
-    _id: string,
-    project_name: string,
-    project_code: string,
-    project_department: string,
-    project_description: string,
-    project_status: string,
-    project_start_date: string,
-    project_end_date: string,
-    updated_by: string,
-    is_deleted: boolean,
-    created_at: string,
-    updated_at: string,
-    project_comment: string | null,
-    project_members: {
-        project_code: string,
-        user_id: string,
-        employee_id: string,
-        user_name: string,
-        full_name: string,
-    }[];
-}
-
 // type Order = "asc" | "desc";
 
 const ViewProject: React.FC = () => {
     const [alignment, setAlignment] = React.useState('basic');
     const [loading, setLoading] = React.useState(true);
+    const [loadingDetail, setLoadingDetail] = useState(false);
     const [results, setResults] = React.useState<ProjectData[]>([]);
     const [curPage, setCurPage] = React.useState(1);
     const [totalPages, setTotalPages] = React.useState(1);
@@ -59,6 +41,7 @@ const ViewProject: React.FC = () => {
     const [inputValue, setInputValue] = React.useState("");
     const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
     const [filteredUsers, setFilteredUsers] = React.useState<User[]>([]);
+    const [openProjectId, setOpenProjectId] = useState<string | null>(null);
 
     const {
         register,
@@ -68,35 +51,6 @@ const ViewProject: React.FC = () => {
         trigger,
         formState: { errors },
     } = useForm<SearchFormInputs>();
-
-    const statusColors: Record<string, string> = {
-        "New": "blue",
-        "Active": "green",
-        "Pending": "orange",
-        "Close": "red",
-    };
-
-    const formatDateToUTC7 = (isoString?: string) => {
-        if (!isoString) return "N/A";
-
-        const date = new Date(isoString);
-        const today = new Date();
-        const yesterday = new Date();
-        if (date.toDateString() === today.toDateString()) {
-            return "Today";
-        } else if (date.toDateString() === yesterday.toDateString()) {
-            return "Yesterday";
-        }
-
-        const formattedDate = new Date(isoString).toLocaleDateString("en-US", {
-            timeZone: "Asia/Ho_Chi_Minh",
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-
-        return formattedDate;
-    };
 
     const handleSort = (property: keyof ProjectData) => {
         setOrderBy((prev) => {
@@ -118,6 +72,19 @@ const ViewProject: React.FC = () => {
     const handleChange = (_event: React.ChangeEvent<unknown>, newAlignment: string) => {
         setAlignment(newAlignment);
     };
+
+    const showProject = (projectId: string) => {
+        setLoadingDetail(true);
+        const randomDelay = Math.random() * (2000 - 1000) + 1000;
+        setTimeout(() => {
+            setOpenProjectId(projectId);
+            setLoadingDetail(false);
+        }, randomDelay);
+    }
+
+    const handleCloseProject = () => {
+        setOpenProjectId(null);
+    }
 
     const sortedRows = [...results].sort((a, b) => {
         for (const sortRule of orderBy) {
@@ -210,17 +177,6 @@ const ViewProject: React.FC = () => {
                 setTotalItems(response.pageInfo.totalItems);
                 setResults(response.pageData);
             }
-            // results.map((project) => {
-            //     project.project_members.map(async (member) => {
-            //         const employeeInfo = await getEmployeeInfo(member.user_id);
-            //         if (employeeInfo && employeeInfo.avatar_url) {
-            //             member.avatar_url = employeeInfo.avatar_url;
-            //         } else {
-            //             member.avatar_url = "";
-            //         }
-            //         console.log(member.avatar_url);
-            //     })
-            // })
         } catch (error) {
             console.error("Error: ", error);
         } finally {
@@ -234,6 +190,16 @@ const ViewProject: React.FC = () => {
 
     return (
         <Layout>
+            {
+                loadingDetail ? (
+                    <div className="fixed inset-0 flex items-center justify-center bg-opacity-70 backdrop-blur-sm z-50">
+                        <div className="flex gap-2">
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.3s" }}></div>
+                            <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce" style={{ animationDelay: "-0.5s" }}></div>
+                        </div>
+                    </div>
+                ) : null}
             <div className='search-projects-container'>
                 <div className='search-bar-input'>
                     <Search onSearch={handleSearch} />
@@ -354,7 +320,7 @@ const ViewProject: React.FC = () => {
                         <TableHead sx={{ "& th": { fontSize: "18px", color: "#040938" } }}>
                             <TableRow>
                                 <TableCell sx={{ width: "5%" }}>No.</TableCell>
-                                <TableCell sx={{ width: "15%" }}>
+                                <TableCell sx={{ width: "20%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_name")}
@@ -380,7 +346,7 @@ const ViewProject: React.FC = () => {
                                         Project Code
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%" }}>
+                                <TableCell sx={{ width: "15%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_start_date")}
@@ -393,7 +359,7 @@ const ViewProject: React.FC = () => {
                                         Start Date
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%" }}>
+                                <TableCell sx={{ width: "15%" }}>
                                     <TableSortLabel
                                         IconComponent={UnfoldMoreIcon}
                                         active={orderBy.some(o => o.key === "project_end_date")}
@@ -406,10 +372,9 @@ const ViewProject: React.FC = () => {
                                         End Date
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell sx={{ width: "10%", textAlign: "center" }}>Status</TableCell>
-                                <TableCell sx={{ width: "20%", textAlign: "center" }}>Members</TableCell>
+                                <TableCell sx={{ width: "10%" }}>Status</TableCell>
                                 <TableCell sx={{ width: "10%" }}>Last updated</TableCell>
-                                <TableCell sx={{ width: "5%" }}></TableCell>
+                                <TableCell sx={{ width: "10%" }}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -439,31 +404,34 @@ const ViewProject: React.FC = () => {
                                         <TableCell>{(curPage - 1) * 10 + index + 1}</TableCell>
                                         <TableCell>{project.project_name}</TableCell>
                                         <TableCell>{project.project_code}</TableCell>
-                                        <TableCell>{formatDateToUTC7(project.project_start_date)}</TableCell>
-                                        <TableCell>{formatDateToUTC7(project.project_end_date)}</TableCell>
+                                        <TableCell>{formatDateWithRelative(project.project_start_date)}</TableCell>
+                                        <TableCell>{formatDateWithRelative(project.project_end_date)}</TableCell>
                                         <TableCell>
                                             <Typography
                                                 variant="body2"
                                                 sx={{
                                                     color: statusColors[project.project_status] || "black",
-                                                    textAlign: "center",
+                                                    fontWeight: "bold",
                                                 }}
                                             >
                                                 {project.project_status}
                                             </Typography>
                                         </TableCell>
-                                        <TableCell sx={{ display: "flex", justifyContent: "center" }}>
-                                            {/* <AvatarGroup
-                                                total={project.project_members.length}
+                                        <TableCell>{formatDateWithRelative(project.updated_at)}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                sx={{ color: "#1E1E1E" }}
+                                                onClick={() => showProject(project._id)}
                                             >
-                                                {project.project_members.map((member) => (
-                                                    <Avatar src={member.avatar_url} />
-                                                ))}
-                                            </AvatarGroup> */}
-                                            Members
+                                                <MoreHorizIcon />
+                                            </IconButton>
+
+                                            <ProjectInfo
+                                                isOpen={openProjectId === project._id}
+                                                handleClose={handleCloseProject}
+                                                project={project}
+                                            />
                                         </TableCell>
-                                        <TableCell>{formatDateToUTC7(project.updated_at)}</TableCell>
-                                        <TableCell><MoreHorizIcon /></TableCell>
                                     </TableRow>
                                 ))
                             )}

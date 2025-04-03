@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Header.css";
 import React, { useEffect, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -20,6 +20,9 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = localStorage.getItem("token") || null;
   const [navbar, setNavbar] = useState(false);
+  const location = useLocation();
+
+  const isHomePage = location.pathname === "/";
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -44,7 +47,7 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
         setNavbar(false);
       }
     };
-  
+
     window.addEventListener('scroll', changeBackground);
     return () => {
       window.removeEventListener('scroll', changeBackground);
@@ -60,7 +63,7 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
   }, [token]);
 
   return (
-    <div className={navbar ? 'layout-header active' : 'layout-header'}>
+    <div className={`${navbar ? "layout-header active" : "layout-header"} ${isHomePage ? "home-page" : ""}`}>
       <div className="layout-header-left">
         {isLoggedIn && (
           <IconButton
@@ -96,7 +99,7 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
               size="large"
               onClick={handleMenu}
             >
-              <AccountCircleIcon sx={{ color: "#fff" }}/>
+              <AccountCircleIcon className="account-icon" />
             </IconButton>
             <Menu
               id="menu-appbar"

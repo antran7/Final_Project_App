@@ -51,7 +51,7 @@ const SideBar = ({ isOpen, toggleSidebar }: SideBarProps) => {
     { text: "Dashboard", icon: <BadgeIcon />, path: "/dashboard" },
     { text: "View Project", icon: <TaskIcon />, path: "/viewprojects" },
     { text: "My Claims", icon: <RequestPageIcon />, path: "/my-requests" },
-  ];
+  ].filter(item => !(user?.role_code === Role.ADMIN && item.text === "My Claims"));;
 
   const adminItems = [
     {
