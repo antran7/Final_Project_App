@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import './ViewProject.css'
 import Layout from '../../../shared/layouts/Layout'
 import Search from '../../../shared/components/searchComponent/Search'
-import { Autocomplete, Button, Grid, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Autocomplete, Button, Grid, IconButton, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useForm } from 'react-hook-form'
@@ -12,6 +12,10 @@ import { debounce } from "lodash";
 import Footer from '../../../shared/components/layoutComponent/Footer'
 import { searchUsers } from '../../admin/services/userService'
 import { User } from '../../admin/types/user'
+import { formatDateWithRelative } from '../services/dateFormat'
+import { statusColors } from '../constants/statusColor'
+import ProjectInfo from '../components/ProjectInfo'
+import { ProjectData } from '../constants/projectData'
 
 
 interface SearchFormInputs {
@@ -19,29 +23,6 @@ interface SearchFormInputs {
     startDate: string;
     endDate: string;
     user_id: string;
-}
-
-interface ProjectData {
-    _id: string,
-    project_name: string,
-    project_code: string,
-    project_department: string,
-    project_description: string,
-    project_status: string,
-    project_start_date: string,
-    project_end_date: string,
-    updated_by: string,
-    is_deleted: boolean,
-    created_at: string,
-    updated_at: string,
-    project_comment: string | null,
-    project_members: {
-        project_code: string,
-        user_id: string,
-        employee_id: string,
-        user_name: string,
-        full_name: string,
-    }[];
 }
 
 // type Order = "asc" | "desc";
@@ -59,6 +40,7 @@ const ViewProject: React.FC = () => {
     const [inputValue, setInputValue] = React.useState("");
     const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
     const [filteredUsers, setFilteredUsers] = React.useState<User[]>([]);
+    const [openProjectId, setOpenProjectId] = useState<string | null>(null);
 
     const {
         register,
@@ -68,35 +50,6 @@ const ViewProject: React.FC = () => {
         trigger,
         formState: { errors },
     } = useForm<SearchFormInputs>();
-
-    const statusColors: Record<string, string> = {
-        "New": "blue",
-        "Active": "green",
-        "Pending": "orange",
-        "Close": "red",
-    };
-
-    const formatDateToUTC7 = (isoString?: string) => {
-        if (!isoString) return "N/A";
-
-        const date = new Date(isoString);
-        const today = new Date();
-        const yesterday = new Date();
-        if (date.toDateString() === today.toDateString()) {
-            return "Today";
-        } else if (date.toDateString() === yesterday.toDateString()) {
-            return "Yesterday";
-        }
-
-        const formattedDate = new Date(isoString).toLocaleDateString("en-US", {
-            timeZone: "Asia/Ho_Chi_Minh",
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-
-        return formattedDate;
-    };
 
     const handleSort = (property: keyof ProjectData) => {
         setOrderBy((prev) => {
@@ -118,6 +71,14 @@ const ViewProject: React.FC = () => {
     const handleChange = (_event: React.ChangeEvent<unknown>, newAlignment: string) => {
         setAlignment(newAlignment);
     };
+
+    const showProject = (projectId: string) => {
+        setOpenProjectId(projectId);
+    }
+
+    const handleCloseProject = () => {
+        setOpenProjectId(null);
+    }
 
     const sortedRows = [...results].sort((a, b) => {
         for (const sortRule of orderBy) {
@@ -439,8 +400,8 @@ const ViewProject: React.FC = () => {
                                         <TableCell>{(curPage - 1) * 10 + index + 1}</TableCell>
                                         <TableCell>{project.project_name}</TableCell>
                                         <TableCell>{project.project_code}</TableCell>
-                                        <TableCell>{formatDateToUTC7(project.project_start_date)}</TableCell>
-                                        <TableCell>{formatDateToUTC7(project.project_end_date)}</TableCell>
+                                        <TableCell>{formatDateWithRelative(project.project_start_date)}</TableCell>
+                                        <TableCell>{formatDateWithRelative(project.project_end_date)}</TableCell>
                                         <TableCell>
                                             <Typography
                                                 variant="body2"
@@ -462,8 +423,21 @@ const ViewProject: React.FC = () => {
                                             </AvatarGroup> */}
                                             Members
                                         </TableCell>
-                                        <TableCell>{formatDateToUTC7(project.updated_at)}</TableCell>
-                                        <TableCell><MoreHorizIcon /></TableCell>
+                                        <TableCell>{formatDateWithRelative(project.updated_at)}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                sx={{ color: "#1E1E1E" }}
+                                                onClick={() => showProject(project._id)}
+                                            >
+                                                <MoreHorizIcon />
+                                            </IconButton>
+
+                                            <ProjectInfo
+                                                isOpen={openProjectId === project._id}
+                                                handleClose={handleCloseProject}
+                                                project={project}
+                                            />
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             )}

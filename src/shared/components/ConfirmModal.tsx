@@ -20,7 +20,7 @@ export default function ConfirmModal({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]">
       <div className="bg-white rounded-lg shadow-lg p-6 w-96 flex flex-col items-center text-center z-[10000]">
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-lg font-semibold text-black">{title}</h2>
         <div className="mt-2 text-gray-700">{content}</div>
         <div className="mt-4 flex justify-center gap-4 w-full">
           {/* Cancel Button */}

@@ -23,7 +23,6 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
   const location = useLocation();
 
   const isHomePage = location.pathname === "/";
-  console.log(isHomePage);
 
   const handleMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

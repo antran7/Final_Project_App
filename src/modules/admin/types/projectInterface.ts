@@ -55,7 +55,7 @@ export interface ProjectMember {
       updated_at: string,
       project_comment: string | null,
       project_members: {
-        project_code: string,
+        project_role: string,
         user_id: string,
         employee_id: string,
         user_name: string,
