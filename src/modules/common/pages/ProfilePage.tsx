@@ -619,6 +619,7 @@ const ProfilePage: React.FC = () => {
                           value={formatDateToUTC7(employee.start_date) || ''}
                           readOnly
                           style={{ width: "100%" }}
+                          title='Cannot edit this field!'
                         />
                       </div>
                       <div style={{ width: "50%" }}>
@@ -627,6 +628,7 @@ const ProfilePage: React.FC = () => {
                           value={formatDateToUTC7(employee.end_date) || ''}
                           readOnly
                           style={{ width: "100%" }}
+                          title='Cannot edit this field!'
                         />
                       </div>
                     </div>
