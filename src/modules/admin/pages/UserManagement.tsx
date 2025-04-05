@@ -38,7 +38,7 @@ import {
   Typography,
   MenuItem,
   InputLabel,
-  TablePagination
+  TablePagination,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Select from "@mui/material/Select";
@@ -47,9 +47,9 @@ import { User, Employee } from "../types/user";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { Pencil, CircleX, Plus, Search, Lock, Unlock, Eye } from "lucide-react";
-import { debounce} from "lodash";
+import { debounce } from "lodash";
 
-// Utility function to format numbers with dots as thousand separators
+
 const formatNumberWithDots = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
@@ -99,7 +99,9 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1); // Total pages from API
   const [viewUser, setViewUser] = useState<User | null>(null); //View detail
   const [jobRanks, setJobRanks] = useState<string[]>([]);
-  const [departments, setDepartments] = useState<{code: string, name: string}[]>([]);
+  const [departments, setDepartments] = useState<
+    { code: string; name: string }[]
+  >([]);
   const [contractTypes, setContractTypes] = useState<string[]>([]);
   const [employeeData, setEmployeeData] = useState<Employee>({
     _id: "",
@@ -134,7 +136,7 @@ const UserManagement = () => {
     password?: string;
     confirmPassword?: string;
   }
-  
+
   const [form, setForm] = useState<UserForm>({
     email: "",
     user_name: "",
@@ -172,16 +174,16 @@ const UserManagement = () => {
     if (!form.email.trim()) newErrors.email = "Email is required";
     if (!form.user_name.trim()) newErrors.user_name = "Username is required";
     if (!editingUser && !form.password?.trim()) {
-        newErrors.password = "Password is required";
+      newErrors.password = "Password is required";
     } else if (!editingUser && (form.password?.length ?? 0) < 6) {
-        newErrors.password = "Password must be at least 6 characters";
+      newErrors.password = "Password must be at least 6 characters";
     }
     if (!editingUser && form.password !== form.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = "Passwords do not match";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Returns true if no errors
-};
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -201,8 +203,6 @@ const UserManagement = () => {
         { keyword: searchTerm.trim() },
         { pageNum, pageSize }
       );
-      console.log("Users type check:", Array.isArray(response.pageData)); // Should be true
-      console.log("Parsed Users:", response.pageData); //  Debug users
       if (response?.pageData && response?.pageInfo) {
         setUsers(response.pageData); //  Correctly setting users
         setTotalPages(response.pageInfo.totalPages || 1); //  Fix pagination
@@ -211,7 +211,11 @@ const UserManagement = () => {
         setUsers([]); // 🛠 Prevent crashes
       }
     } catch (error) {
-      toast.error(`Failed to fetch users: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
+      toast.error(
+        `Failed to fetch users: ${
+          error instanceof Error ? error.message : JSON.stringify(error)
+        }`
+      );
 
       setUsers([]); // 🛠 Prevent UI crash
     } finally {
@@ -225,7 +229,7 @@ const UserManagement = () => {
   useEffect(() => {
     debouncedFetchUsers();
     return () => debouncedFetchUsers.cancel();
-  }, [debouncedFetchUsers]); 
+  }, [debouncedFetchUsers]);
 
   const filteredUsers = users.filter(
     (user) =>
@@ -264,8 +268,12 @@ const UserManagement = () => {
       setPopupOpen(false); // Close popup after saving
       fetchUsers(); // Refresh the user list
     } catch (error) {
-      toast.error(`Failed to save users: ${error instanceof Error ? error.message : JSON.stringify(error)}`);
-    }finally {
+      toast.error(
+        `Failed to save users: ${
+          error instanceof Error ? error.message : JSON.stringify(error)
+        }`
+      );
+    } finally {
       setLoading(false); // Set loading to false
     }
   };
@@ -288,10 +296,15 @@ const UserManagement = () => {
         );
       } else if (confirmDialog.action === "delete") {
         await deleteUser(confirmDialog.user._id);
+        toast.success("User deleted successfully!");
         fetchUsers();
       }
     } catch (error) {
-      toast.error(`Failed to ${confirmDialog.action} user: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(
+        `Failed to ${confirmDialog.action} user: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     } finally {
       setConfirmDialog({ open: false, user: null, action: null });
       setLoading(false);
@@ -299,22 +312,18 @@ const UserManagement = () => {
   };
 
   const handleOpenEmployeeDetails = async (id: string) => {
-    console.log("Fetching details for User ID:", id);
-
+    setLoading(true);
     if (!id) {
       toast.error("Invalid User ID");
       return;
     }
 
     try {
-      const employee = await getEmployeeById(id); // Now TypeScript knows `employee` has all properties
-    
-      console.log("Fixed Response Data:", employee);
-    
+      const employee = await getEmployeeById(id);
       if (!employee || Object.keys(employee).length === 0) {
         throw new Error("No employee data found");
       }
-    
+
       // Set state without TypeScript errors
       setEmployeeData({
         _id: employee._id,
@@ -334,23 +343,41 @@ const UserManagement = () => {
         account: employee.account || "",
         __v: employee.__v,
       });
-    
+
       setPopupOpen2(true);
     } catch (error) {
       console.error("Error fetching employee details:", error);
-      toast.error(error instanceof Error ? error.message : "Error fetching employee details");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error fetching employee details"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSaveEmployeeDetails = async () => {
+    setLoading(true);
     try {
-      console.log("Sending to API:", employeeData);
-  
       // Validate the payload
-      if (!employeeData.user_id || !employeeData.job_rank || !employeeData.contract_type) {
+      if (
+        !employeeData.user_id ||
+        !employeeData.job_rank ||
+        !employeeData.contract_type
+      ) {
         throw new Error("Missing required fields in employee data");
       }
-  
+
+      // Validate end date is after start date
+      if (employeeData.end_date && employeeData.start_date) {
+        if (employeeData.end_date < employeeData.start_date) {
+          toast.error("End date must be after start date");
+          setLoading(false);
+          return;
+        }
+      }
+
       // Prepare employee data with all fields from the requirements
       const employeePayload = {
         user_id: employeeData.user_id,
@@ -364,14 +391,14 @@ const UserManagement = () => {
         department_code: employeeData.department_code,
         salary: employeeData.salary,
         start_date: employeeData.start_date,
-        end_date: employeeData.end_date
+        end_date: employeeData.end_date,
       };
-  
+
       // Send the request to update the employee
       await updateEmployee(employeeData.user_id, employeePayload);
-  
+
       toast.success("Employee updated successfully!");
-      setPopupOpen2(false); // Close the dialog after successful update
+      setPopupOpen2(false);
     } catch (error) {
       console.error("Error updating employee details:", error);
       toast.error(
@@ -379,9 +406,11 @@ const UserManagement = () => {
           ? error.message
           : "Error updating employee details"
       );
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   const handleRoleChange = async (userId: string, newRoleCode: string) => {
     if (!userId) return;
 
@@ -399,8 +428,11 @@ const UserManagement = () => {
       );
       toast.success("User role updated successfully!");
     } catch (error) {
-      console.error("Error updating role:", error);
-      toast.error(`Error updating role: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(
+        `Error updating role: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     } finally {
       setLoading(false); // Set loading to false
     }
@@ -410,120 +442,143 @@ const UserManagement = () => {
     const loadFormData = async () => {
       try {
         // Fetch job ranks, departments, and contracts
-        const [jobRanksData, departmentsData, contractsData] = await Promise.all([
-          fetchJobRanks(),
-          fetchDepartments(),
-          fetchContracts()
-        ]);
-        
-        console.log('Raw API responses:', { jobRanksData, departmentsData, contractsData });
-        
+        const [jobRanksData, departmentsData, contractsData] =
+          await Promise.all([
+            fetchJobRanks(),
+            fetchDepartments(),
+            fetchContracts(),
+          ]);
+
         // Extract the actual job rank values from the response based on the response structure
         const processJobRanks = (data: JobRankResponse): string[] => {
           // Check if the API response has the expected structure
-          if (data && typeof data === 'object' && 'success' in data && data.success) {
+          if (
+            data &&
+            typeof data === "object" &&
+            "success" in data &&
+            data.success
+          ) {
             // Success response with data array
-            if ('data' in data && Array.isArray(data.data)) {
+            if ("data" in data && Array.isArray(data.data)) {
               // Map to get job_rank values from each object in the array
-              return data.data.map(item => item.job_rank || '');
+              return data.data.map((item) => item.job_rank || "");
             }
           }
-          
+
           // Fallback: try to find arrays in the response
-          if (typeof data === 'object' && data !== null) {
-            const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+          if (typeof data === "object" && data !== null) {
+            const possibleArrays = Object.values(data).filter((val) =>
+              Array.isArray(val)
+            );
             for (const arr of possibleArrays) {
               if (arr.length > 0) {
-                return arr.map((item: JobRankData) => item.job_rank || '');
+                return arr.map((item: JobRankData) => item.job_rank || "");
               }
             }
           }
-          
+
           return [];
         };
-        
+
         // Process departments
-        const processDepartments = (data: DepartmentResponse): {code: string, name: string}[] => {
-          if (data && typeof data === 'object' && 'success' in data && data.success) {
-            if ('data' in data && Array.isArray(data.data)) {
-              return data.data.map(item => ({
-                code: item.department_code || item.code || '',
-                name: item.department_name || item.name || ''
+        const processDepartments = (
+          data: DepartmentResponse
+        ): { code: string; name: string }[] => {
+          if (
+            data &&
+            typeof data === "object" &&
+            "success" in data &&
+            data.success
+          ) {
+            if ("data" in data && Array.isArray(data.data)) {
+              return data.data.map((item) => ({
+                code: item.department_code || item.code || "",
+                name: item.department_name || item.name || "",
               }));
             }
           }
-          
+
           // Fallback
-          if (typeof data === 'object' && data !== null) {
-            const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+          if (typeof data === "object" && data !== null) {
+            const possibleArrays = Object.values(data).filter((val) =>
+              Array.isArray(val)
+            );
             for (const arr of possibleArrays) {
               if (arr.length > 0) {
                 return arr.map((item: DepartmentData) => ({
-                  code: item.department_code || item.code || '',
-                  name: item.department_name || item.name || ''
+                  code: item.department_code || item.code || "",
+                  name: item.department_name || item.name || "",
                 }));
               }
             }
           }
-          
+
           return [];
         };
-        
+
         // Process contract types
         const processContracts = (data: ContractResponse): string[] => {
-          if (data && typeof data === 'object' && 'success' in data && data.success) {
-            if ('data' in data && Array.isArray(data.data)) {
-              return data.data.map(item => item.contract_type || '');
+          if (
+            data &&
+            typeof data === "object" &&
+            "success" in data &&
+            data.success
+          ) {
+            if ("data" in data && Array.isArray(data.data)) {
+              return data.data.map((item) => item.contract_type || "");
             }
           }
-          
+
           // Fallback
-          if (typeof data === 'object' && data !== null) {
-            const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
+          if (typeof data === "object" && data !== null) {
+            const possibleArrays = Object.values(data).filter((val) =>
+              Array.isArray(val)
+            );
             for (const arr of possibleArrays) {
               if (arr.length > 0) {
-                return arr.map((item: ContractData) => item.contract_type || '');
+                return arr.map(
+                  (item: ContractData) => item.contract_type || ""
+                );
               }
             }
           }
-          
+
           return [];
         };
-        
+
         const ranks = processJobRanks(jobRanksData as JobRankResponse);
         const depts = processDepartments(departmentsData as DepartmentResponse);
         const contracts = processContracts(contractsData as ContractResponse);
-        
-        console.log('Extracted data:', { 
-          ranks, 
-          depts, 
-          contracts 
+
+        console.log("Extracted data:", {
+          ranks,
+          depts,
+          contracts,
         });
-        
+
         setJobRanks(ranks);
         setDepartments(depts);
         setContractTypes(contracts);
-        
       } catch (error) {
         console.error("Error loading form data:", error);
         toast.error("Failed to load form data. Please try again.");
       }
     };
-    
+
     loadFormData();
   }, []);
 
   // Add these useEffects after the other useEffects
   useEffect(() => {
-    console.log('Job ranks updated:', jobRanks);
+    console.log("Job ranks updated:", jobRanks);
   }, [jobRanks]);
 
   useEffect(() => {
-    console.log('Departments updated:', departments);
+    console.log("Departments updated:", departments);
   }, [departments]);
 
   useEffect(() => {
-    console.log('Contract types updated:', contractTypes);
+    console.log("Contract types updated:", contractTypes);
   }, [contractTypes]);
 
   return (
@@ -534,7 +589,7 @@ const UserManagement = () => {
           USER MANAGEMENT
         </h1>
         <div className="p-4 bg-gray-100">
-        {loading && <Preloader />}
+          {loading && <Preloader />}
           <div className="flex justify-end items-center gap-4 mb-4">
             <div className="w-[250px] min-w-[150px] ">
               <div className="relative">
@@ -621,29 +676,30 @@ const UserManagement = () => {
                     color: "gray",
                   }}
                 />
-                  {/* Role Dropdown (ONLY for Adding New User) */}
-                  {!editingUser && (
-                    <>
-                      Role<span className="text-red-600">*</span>
-                      <Select
-                        fullWidth
-                        margin="dense"
-                        value={form.role_code}
-                        onChange={(e) => setForm({ ...form, role_code: e.target.value })}
-                        sx={{
-                          backgroundColor: "#E3F2FD",
-                          borderRadius: "6px",
-                        }}
-                      >
-                        {Object.entries(roleMap).map(([code, label]) => (
-                          <MenuItem key={code} value={code}>
-                            {label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </>
-                  )}
-
+                {/* Role Dropdown (ONLY for Adding New User) */}
+                {!editingUser && (
+                  <>
+                    Role<span className="text-red-600">*</span>
+                    <Select
+                      fullWidth
+                      margin="dense"
+                      value={form.role_code}
+                      onChange={(e) =>
+                        setForm({ ...form, role_code: e.target.value })
+                      }
+                      sx={{
+                        backgroundColor: "#E3F2FD",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      {Object.entries(roleMap).map(([code, label]) => (
+                        <MenuItem key={code} value={code}>
+                          {label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </>
+                )}
                 {/* Password Field (ONLY for Adding New User) */}
                 <span
                   style={{ visibility: editingUser ? "hidden" : "visible" }}
@@ -713,22 +769,22 @@ const UserManagement = () => {
               </DialogContent>
 
               <DialogActions>
-              <Button 
-                onClick={() => {
-                  setPopupOpen(false); // Close the dialog
-                  setForm({
-                    email: "",
-                    user_name: "",
-                    role_code: "A001",
-                    password: "",
-                    confirmPassword: "",
-                  }); // Reset the form
-                  setErrors({}); // Clear errors
-                }}
-                color="error"
-              >
-                Cancel
-              </Button>
+                <Button
+                  onClick={() => {
+                    setPopupOpen(false); // Close the dialog
+                    setForm({
+                      email: "",
+                      user_name: "",
+                      role_code: "A001",
+                      password: "",
+                      confirmPassword: "",
+                    }); // Reset the form
+                    setErrors({}); // Clear errors
+                  }}
+                  color="error"
+                >
+                  Cancel
+                </Button>
                 <Button onClick={handleSave} color="primary">
                   Save
                 </Button>
@@ -831,7 +887,9 @@ const UserManagement = () => {
                           >
                             Created At
                           </Typography>
-                          <Typography>{viewUser.created_at?.toLocaleString()}</Typography>
+                          <Typography>
+                            {viewUser.created_at?.toLocaleString()}
+                          </Typography>
                         </CardContent>
                       </Card>
                     </Grid>
@@ -848,7 +906,9 @@ const UserManagement = () => {
                           >
                             Updated At
                           </Typography>
-                          <Typography>{viewUser.updated_at?.toLocaleString()}</Typography>
+                          <Typography>
+                            {viewUser.updated_at?.toLocaleString()}
+                          </Typography>
                         </CardContent>
                       </Card>
                     </Grid>
@@ -1027,16 +1087,16 @@ const UserManagement = () => {
                         }
                         sx={{
                           textAlign: "center",
-                          textTransform: "none", // Không viết hoa chữ
-                          borderRadius: "12px", // Bo tròn góc
-                          fontWeight: 600, // Chữ đậm
+                          textTransform: "none",
+                          borderRadius: "12px",
+                          fontWeight: 600,
                           backgroundColor: user.is_blocked
                             ? "#FF3B30"
                             : "#34C759",
                           "&:hover": {
                             backgroundColor: user.is_blocked
                               ? "#D32F2F"
-                              : "#2E7D32", // Màu khi hover
+                              : "#2E7D32",
                           },
                         }}
                       >
@@ -1058,7 +1118,7 @@ const UserManagement = () => {
                             user_name: user.user_name,
                             role_code: user.role_code,
                           });
-                          setPopupOpen(true); // Open popup
+                          setPopupOpen(true);
                         }}
                       >
                         <Pencil size={18} />
@@ -1079,7 +1139,7 @@ const UserManagement = () => {
 
                       <Button
                         onClick={() => {
-                          console.log("Selected User ID:", user._id); // ✅ Check if user.id exists
+                          console.log("Selected User ID:", user._id); // Check if user.id exists
                           handleOpenEmployeeDetails(user._id);
                         }}
                       >
@@ -1143,7 +1203,13 @@ const UserManagement = () => {
             {/* Employee Fields */}
             {employeeData && (
               <>
-                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: "20px",
+                  }}
+                >
                   <Avatar
                     alt={employeeData.full_name}
                     src={employeeData.avatar_url}
@@ -1225,92 +1291,111 @@ const UserManagement = () => {
                     labelId="job-rank-label"
                     value={employeeData.job_rank || ""}
                     onChange={(e) => {
-                      console.log('Job ranks state:', jobRanks);
-                      setEmployeeData({ ...employeeData, job_rank: e.target.value });
+                      console.log("Job ranks state:", jobRanks);
+                      setEmployeeData({
+                        ...employeeData,
+                        job_rank: e.target.value,
+                      });
                     }}
                     displayEmpty
                   >
-                    <MenuItem value="" disabled>
-                    </MenuItem>
-                    {jobRanks.length > 0 ? (
-                      jobRanks.map((rank) => (
-                        <MenuItem key={rank} value={rank}>
-                          {rank}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      // Fallback to hardcoded values if API fails
-                      [
-                        "TC3", "TC2", "TC1",
-                        "TEST3", "TEST2", "TEST1",
-                        "DEV3", "DEV2", "DEV1",
-                        "QA3", "QA2", "QA1",
-                        "BA3", "BA2", "BA1",
-                        "TL3", "TL2", "TL1",
-                        "PM3", "PM2", "PM1",
-                        "BUL", "FI3", "FI2", "FI1",
-                        "Admin"
-                      ].map((job_rank) => (
-                        <MenuItem key={job_rank} value={job_rank}>
-                          {job_rank}
-                        </MenuItem>
-                      ))
-                    )}
+                    <MenuItem value="" disabled></MenuItem>
+                    {jobRanks.length > 0
+                      ? jobRanks.map((rank) => (
+                          <MenuItem key={rank} value={rank}>
+                            {rank}
+                          </MenuItem>
+                        ))
+                      : // Fallback to hardcoded values if API fails
+                        [
+                          "TC3",
+                          "TC2",
+                          "TC1",
+                          "TEST3",
+                          "TEST2",
+                          "TEST1",
+                          "DEV3",
+                          "DEV2",
+                          "DEV1",
+                          "QA3",
+                          "QA2",
+                          "QA1",
+                          "BA3",
+                          "BA2",
+                          "BA1",
+                          "TL3",
+                          "TL2",
+                          "TL1",
+                          "PM3",
+                          "PM2",
+                          "PM1",
+                          "BUL",
+                          "FI3",
+                          "FI2",
+                          "FI1",
+                          "Admin",
+                        ].map((job_rank) => (
+                          <MenuItem key={job_rank} value={job_rank}>
+                            {job_rank}
+                          </MenuItem>
+                        ))}
                   </Select>
                 </FormControl>
 
-                 <FormControl fullWidth margin="dense">
+                <FormControl fullWidth margin="dense">
                   <InputLabel>Department Code</InputLabel>
                   <Select
                     value={employeeData.department_code || ""}
                     onChange={(e) => {
-                      console.log('Departments state:', departments);
-                      setEmployeeData({ ...employeeData, department_code: e.target.value });
+                      console.log("Departments state:", departments);
+                      setEmployeeData({
+                        ...employeeData,
+                        department_code: e.target.value,
+                      });
                     }}
                     displayEmpty
                   >
                     <MenuItem value="" disabled></MenuItem>
-                    {departments.length > 0 ? (
-                      departments.map((dept) => (
-                        <MenuItem key={dept.code} value={dept.code}>
-                          {dept.name || dept.code}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      // Fallback to hardcoded values if API fails
-                      ["DE01", "DE02", "DE03", "DE04"].map((dept) => (
-                        <MenuItem key={dept} value={dept}>
-                          {dept}
-                        </MenuItem>
-                      ))
-                    )}
+                    {departments.length > 0
+                      ? departments.map((dept) => (
+                          <MenuItem key={dept.code} value={dept.code}>
+                            {dept.name || dept.code}
+                          </MenuItem>
+                        ))
+                      : // Fallback to hardcoded values if API fails
+                        ["DE01", "DE02", "DE03", "DE04"].map((dept) => (
+                          <MenuItem key={dept} value={dept}>
+                            {dept}
+                          </MenuItem>
+                        ))}
                   </Select>
                 </FormControl>
-                  <FormControl fullWidth margin="dense">
+                <FormControl fullWidth margin="dense">
                   <InputLabel>Contract Type</InputLabel>
                   <Select
                     value={employeeData.contract_type || ""}
                     onChange={(e) => {
-                      console.log('Contract types state:', contractTypes);
-                      setEmployeeData({ ...employeeData, contract_type: e.target.value });
+                      console.log("Contract types state:", contractTypes);
+                      setEmployeeData({
+                        ...employeeData,
+                        contract_type: e.target.value,
+                      });
                     }}
                     displayEmpty
                   >
                     <MenuItem value="" disabled></MenuItem>
-                    {contractTypes.length > 0 ? (
-                      contractTypes.map((type) => (
-                        <MenuItem key={type} value={type}>
-                          {type}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      // Fallback to hardcoded values if API fails
-                      ["INDEFINITE", "THREE YEAR", "ONE YEAR"].map((type) => (
-                        <MenuItem key={type} value={type}>
-                          {type}
-                        </MenuItem>
-                      ))
-                    )}
+                    {contractTypes.length > 0
+                      ? contractTypes.map((type) => (
+                          <MenuItem key={type} value={type}>
+                            {type}
+                          </MenuItem>
+                        ))
+                      : // Fallback to hardcoded values if API fails
+                        ["INDEFINITE", "THREE YEAR", "ONE YEAR"].map((type) => (
+                          <MenuItem key={type} value={type}>
+                            {type}
+                          </MenuItem>
+                        ))}
                   </Select>
                 </FormControl>
                 <TextField
@@ -1328,59 +1413,77 @@ const UserManagement = () => {
                   fullWidth
                   margin="dense"
                   InputProps={{
-                    inputProps: { 
-                      inputMode: "numeric", 
-                      style: { textAlign: "right" } 
-                    }
+                    inputProps: {
+                      inputMode: "numeric",
+                      style: { textAlign: "right" },
+                    },
                   }}
                 />
 
-                  <div style={{ textAlign: "right" }}>
-                    <TextField
-                      label="Start Date"
-                      type="date"
-                      value={employeeData.start_date ? format(employeeData.start_date, "yyyy-MM-dd") : ""}
-                      onChange={(e) =>
-                        setEmployeeData({ ...employeeData, start_date: new Date(e.target.value) })
-                      }
-                      fullWidth
-                      margin="dense"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </div>
+                <div style={{ textAlign: "right" }}>
+                  <TextField
+                    label="Start Date"
+                    type="date"
+                    value={
+                      employeeData.start_date
+                        ? format(employeeData.start_date, "yyyy-MM-dd")
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setEmployeeData({
+                        ...employeeData,
+                        start_date: new Date(e.target.value),
+                      })
+                    }
+                    fullWidth
+                    margin="dense"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </div>
 
-                  <div style={{ textAlign: "right" }}>
-                    <TextField
-                      label="End Date"
-                      type="date"
-                      value={employeeData.end_date ? format(employeeData.end_date, "yyyy-MM-dd") : ""}
-                      onChange={(e) =>
-                        setEmployeeData({ ...employeeData, end_date: new Date(e.target.value) })
-                      }
-                      fullWidth
-                      margin="dense"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </div>
-                </>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setPopupOpen2(false)} color="secondary">
-                Cancel
-              </Button>
-              <Button onClick={handleSaveEmployeeDetails} color="primary" variant="contained">
-                Save
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </div>
-      </Layout>
-    );
+                <div style={{ textAlign: "right" }}>
+                  <TextField
+                    label="End Date"
+                    type="date"
+                    value={
+                      employeeData.end_date
+                        ? format(employeeData.end_date, "yyyy-MM-dd")
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setEmployeeData({
+                        ...employeeData,
+                        end_date: new Date(e.target.value),
+                      })
+                    }
+                    fullWidth
+                    margin="dense"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setPopupOpen2(false)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEmployeeDetails}
+              color="primary"
+              variant="contained"
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </Layout>
+  );
 };
 
 export default UserManagement;
