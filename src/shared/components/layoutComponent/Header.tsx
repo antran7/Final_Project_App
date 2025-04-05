@@ -74,7 +74,10 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
             <MenuIcon style={{ fontSize: '30px' }} />
           </IconButton>
         )}
-        <h1 className="animate__animated animate__fadeIn animate__infinite">
+        <h1
+          className="animate__animated animate__fadeIn animate__infinite"
+          onClick={() => navigate("/")}
+        >
           Claim Management
         </h1>
       </div>

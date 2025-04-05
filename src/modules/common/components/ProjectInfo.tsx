@@ -14,7 +14,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import './ProjectInfo.css';
 import { ProjectData } from '../constants/projectData';
 import { formatDateWithRelative } from '../services/dateFormat';
 import { statusColors } from '../constants/statusColor';
@@ -33,8 +32,8 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ isOpen, handleClose, project 
             open={isOpen}
             sx={{
                 '& .MuiDialog-paper': {
-                    maxWidth: "700px", // Giới hạn chiều rộng
-                    maxHeight: "80vh", // Giới hạn chiều cao
+                    maxWidth: "700px",
+                    maxHeight: "80vh",
                 },
             }}
             BackdropProps={{
@@ -44,7 +43,7 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ isOpen, handleClose, project 
                 }
             }}
         >
-            <DialogTitle className='project-info-header' id="customized-dialog-title">
+            <DialogTitle className="flex items-center p-4">
                 <AssignmentIcon sx={{
                     backgroundColor: "#F3F3F3",
                     fontSize: "35px",
@@ -53,22 +52,14 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ isOpen, handleClose, project 
                     borderRadius: "50%",
                     p: "5px",
                 }} />
-                <div className='project-title'>
+                <div className="ml-4 leading-5">
                     <h1>{project.project_name}</h1>
-                    <small>Code: {project.project_code}</small>
+                    <small className="text-gray-500">Code: {project.project_code}</small>
                 </div>
-                <div className='project-status'>
+                <div className="ml-4">
                     <Typography
-                        variant='body1'
-                        sx={{
-                            border: `1px solid ${statusColors[project.project_status] || "black"}`,
-                            borderRadius: '10px',
-                            color: statusColors[project.project_status] || "black",
-                            textAlign: "center",
-                            fontWeight: "bold",
-                            padding: "2px 10px",
-                            ml: 2,
-                        }}
+                        variant="body1"
+                        className={`border border-[${statusColors[project.project_status] || "black"}] rounded-lg text-[${statusColors[project.project_status] || "black"}] text-center font-bold px-4 py-1 ml-2`}
                     >
                         {project.project_status}
                     </Typography>
@@ -87,35 +78,34 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ isOpen, handleClose, project 
                 <CloseIcon />
             </IconButton>
 
-            {/* ✅ Chỉ DialogContent cuộn khi nội dung vượt quá maxHeight */}
-            <DialogContent dividers sx={{ maxHeight: "60vh", display: "flex", flexDirection: "column" }}>
-                <div className='project-info-content'>
-                    <div className='project-content-date'>
-                        <div className='project-content-startdate'>
-                            <h2>Start date:</h2>
-                            <Typography>
+            <DialogContent dividers className="max-h-[60vh] flex flex-col">
+                <div className="flex flex-col gap-5 min-w-[360px] py-2">
+                    <div className="flex">
+                        <div className="flex-1">
+                            <h2 className="font-bold">Start date:</h2>
+                            <Typography className="text-lg text-gray-500">
                                 {formatDateWithRelative(project.project_start_date)}
                             </Typography>
                         </div>
-                        <div className='project-content-enddate'>
-                            <h2>End date:</h2>
-                            <Typography>
+                        <div className="flex-1">
+                            <h2 className="font-bold">End date:</h2>
+                            <Typography className="text-lg text-gray-500">
                                 {formatDateWithRelative(project.project_end_date)}
                             </Typography>
                         </div>
                     </div>
-                    <div className='project-content-department'>
-                        <h2>Department:</h2>
-                        <Typography>{project.project_department}</Typography>
+                    <div>
+                        <h2 className="font-bold">Department:</h2>
+                        <Typography className="text-lg text-gray-500">{project.project_department}</Typography>
                     </div>
-                    <div className='project-content-description'>
-                        <h2>Description:</h2>
-                        <Typography>{project.project_description}</Typography>
+                    <div>
+                        <h2 className="font-bold">Description:</h2>
+                        <Typography className="text-lg text-gray-500">{project.project_description}</Typography>
                     </div>
                 </div>
 
-                <div className='project-info-members' style={{ flexGrow: 1 }}>
-                    <h2>Members:</h2>
+                <div className="mt-5">
+                    <h2 className="font-bold mb-5">Members:</h2>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 550 }} aria-label="simple table">
                             <TableHead>
@@ -148,8 +138,7 @@ const ProjectInfo: React.FC<ProjectInfoProps> = ({ isOpen, handleClose, project 
                 </button>
             </DialogActions>
         </Dialog>
-
     )
 }
 
-export default ProjectInfo
+export default ProjectInfo;

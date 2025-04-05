@@ -1,7 +1,3 @@
-.service-page {
-    height: 100%;
-}
-
 .service-header {
     background-image: url('https://images.unsplash.com/photo-1605152276897-4f618f831968?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
     background-size: cover;
@@ -12,7 +8,7 @@
     align-items: center;
     min-height: 55vh;
     position: relative;
-    margin-bottom: 30vh;
+    margin-bottom: 15%;
 
     .service-title {
         width: 50%;
@@ -48,12 +44,25 @@
             text-align: center;
             width: 300px;
             padding: 30px 15px 15px 15px;
-
-            h3 {
-                font-weight: bold;
-                margin: 20px 0 10px 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+          
+            &:hover {
+              transform: scale(1.05);
+              box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             }
-        }
+          
+            h3 {
+              font-weight: bold;
+              margin: 20px 0 10px 0;
+            }
+          }
+          
+          /* Thêm hiệu ứng cho icon khi hover */
+          .service-items:hover .service-icon {
+            transform: rotate(360deg) scale(1.1);
+            transition: transform 0.6s ease;
+          }
     }
 }
 
@@ -62,10 +71,156 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    margin-bottom: 10%;
 
     h2 {
         font-size: 50px;
         font-weight: bold;
         color: #1C3637;
+        margin-bottom: 1.5em;
     }
+}
+
+.service-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: 2.5em;
+    width: 100%;
+
+    .service-list__row {
+        display: flex;
+        padding-left: 10%;
+
+        .service-list__item {
+            flex: 1;
+
+            h3 {
+                font-size: 23px;
+                margin-bottom: 1em;
+            }
+
+            li {
+                font-size: 20px;
+                line-height: 2;
+            }
+        }
+    }
+}
+
+.service-posts {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10%;
+
+    .service-posts__item--dark {
+        display: flex;
+        align-items: center;
+        background-color: #333333;
+        height: 70vh;
+        column-gap: 5em;
+
+        .left-content-dark,
+        .right-content-dark {
+            flex: 1;
+        }
+
+        .left-content-dark {
+            display: flex;
+            justify-content: flex-end;
+            .left-dark-container {
+                h2 {
+                    font-size: 40px;
+                    font-weight: bold;
+                    color: #fff;
+                    margin-bottom: 0.6em;
+                }
+
+                .left-dark-desc {
+                    line-height: 2;
+                }
+
+                h3 {
+                    color: #fff;
+                    display: flex;
+                    align-items: center;
+                    column-gap: 10px;
+                    font-size: 18px;
+                }
+            }
+        }
+
+        .right-content-dark {
+            display: flex;
+            align-items: center;
+            height: 100%;
+
+            img {
+                height: 75%;
+                border-radius: 3em;
+            }
+        }
+    }
+
+    .service-posts__item--white {
+        display: flex;
+        align-items: center;
+        height: 70vh;
+        column-gap: 3em;
+
+        .left-content-white,
+        .right-content-white {
+            flex: 1;
+        }
+
+        .left-content-white {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            height: 100%;
+
+            img {
+                height: 75%;
+                border-radius: 3em;
+            }
+        }
+
+        .right-content-white {
+            display: flex;
+            align-items: center;
+            height: 100%;
+
+            .right-white-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background-color: #F1F6F9;
+                width: fit-content;
+                height: 75%;
+                padding: 35px 25px;
+                border-radius: 3em;
+
+                h2 {
+                    font-size: 40px;
+                    font-weight: bold;
+                    margin-bottom: 0.6em;
+                }
+
+                .right-white-desc {
+                    line-height: 2;
+                }
+
+                h3 {
+                    display: flex;
+                    align-items: center;
+                    column-gap: 10px;
+                    font-size: 18px;
+                    line-height: 2;
+                }
+            }
+        }
+    }
+
 }
