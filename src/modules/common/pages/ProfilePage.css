@@ -107,7 +107,7 @@
         width: 100%;
         margin-top: 20px;
         background-image: linear-gradient(to right, #F89904, #DB27D2);
-        background-size: 100% 0px; 
+        background-size: 100% 0px;
         background-position: bottom left;
         background-repeat: no-repeat;
         transition: border-bottom background-size 0.3s ease-in-out;
@@ -209,21 +209,41 @@
         font-weight: bold;
       }
 
-      input {
-        outline: none;
-        border-bottom: 2px solid #ccc;
-        padding: 5px 0;
-        width: 100%;
-        background-image: linear-gradient(to right, #F89904, #DB27D2);
-        background-size: 100% 0px; 
-        background-position: bottom left;
-        background-repeat: no-repeat;
-        transition: border-bottom background-size 0.3s ease-in-out;
+      .profile-edit-input {
+        display: flex;
+        gap: 30px;
+
+        input {
+          outline: none;
+          border-bottom: 2px solid #ccc;
+          padding: 5px 0;
+          width: 100%;
+          background-image: linear-gradient(to right, #F89904, #DB27D2);
+          background-size: 100% 0px;
+          background-position: bottom left;
+          background-repeat: no-repeat;
+          transition: border-bottom background-size 0.3s ease-in-out;
+        }
+
+        input:hover {
+          border-bottom: 2px solid transparent;
+          background-size: 100% 2px;
+        }
       }
-      
-      input:hover {
-        border-bottom: 2px solid transparent;
-        background-size: 100% 2px;
+
+      .profile-disabled-input {
+        display: flex;
+        gap: 30px;
+
+        input {
+          outline: none;
+          padding: 5px;
+          width: 100%;
+          color: #727273;
+          background-color: #FAFAFA;
+          border: 1px solid #DCDDE0;
+          border-radius: 10px;
+        }
       }
 
       button {

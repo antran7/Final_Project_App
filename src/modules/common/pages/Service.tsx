@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '../../../shared/layouts/Layout';
 import Footer from '../../../shared/components/layoutComponent/Footer';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -7,16 +7,25 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import GroupIcon from '@mui/icons-material/Group';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
-import './Service.css';
 import { Button } from '@mui/material';
 
 const ServicePage: React.FC = () => {
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []);
+
   return (
     <Layout>
       <div className='service-page'>
         <div className='bg-[url("https://images.unsplash.com/photo-1605152276897-4f618f831968?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")] bg-cover bg-center bg-no-repeat flex flex-col items-center min-h-[55vh] relative mb-[15%]'>
           <div className='w-1/2 text-center text-white'>
-            <h1 className='text-[50px] font-bold mt-[50px] mb-[30px] text-shadow-md'>
+            <h1 className='text-[50px] font-bold mt-[50px] mb-[30px] drop-shadow-[2px_2px_5px_rgba(0,0,0,0.3)]'>
               Affordable Claiming Services Tailored For You
             </h1>
             <p className='text-[18px] mt-[20px]'>
@@ -112,29 +121,33 @@ const ServicePage: React.FC = () => {
           </div>
         </div>
 
-        <div className='service-posts'>
-          <div className='service-posts__item--dark flex items-center bg-[#333333] h-[70vh] gap-[5em]'>
-            <div className='left-content-dark flex justify-end flex-1'>
-              <div className='left-dark-container'>
-                <h2 className='text-[40px] font-bold text-white mb-[0.6em]'>Streamlined Claim Processing</h2>
-                <div className='left-dark-desc'>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+        <div className="flex flex-col w-full mb-[10%]">
+          {/* DARK BLOCK 1 */}
+          <div
+            id='post-1'
+            className="flex items-center bg-[#333333] h-[70vh] gap-[5em]"
+          >
+            <div className="flex-1 flex justify-end">
+              <div>
+                <h2 className="text-white text-[40px] font-bold mb-[0.6em]">Streamlined Claim Processing</h2>
+                <div className="leading-loose">
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Fast Submission - Submit claims in seconds
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     File Attachments - Upload receipts & invoices
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Live Tracking - Check status anytime
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Claim History - View past requests
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Auto-Validation - Reduce errors instantly
                   </h3>
@@ -164,44 +177,48 @@ const ServicePage: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <div className='right-content-dark flex items-center h-full'>
+            <div className="flex-1 flex items-center h-full">
               <img
-                className='h-[75%] rounded-[3em]'
+                className="h-[75%] rounded-[3em]"
                 alt=""
-                src='https://static.wixstatic.com/media/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg'
+                src="https://static.wixstatic.com/media/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg"
               />
             </div>
           </div>
 
-          <div className='service-posts__item--white flex items-center h-[70vh] gap-[3em]'>
-            <div className='left-content-white flex justify-end items-center h-full flex-1'>
+          {/* WHITE BLOCK 2 */}
+          <div
+            id='post-2'
+            className="flex items-center h-[70vh] gap-[3em]"
+          >
+            <div className="flex-1 flex justify-end items-center h-full">
               <img
-                className='h-[75%] rounded-[3em]'
+                className="h-[75%] rounded-[3em]"
                 alt=""
-                src='https://static.wixstatic.com/media/11062b_aa4665bc130a49728ebf3c1e65dd90e6~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/02.jpg'
+                src="https://static.wixstatic.com/media/11062b_aa4665bc130a49728ebf3c1e65dd90e6~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/02.jpg"
               />
             </div>
-            <div className='right-content-white flex items-center h-full'>
-              <div className='right-white-container flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] p-[35px] [25px] rounded-[3em]'>
-                <h2 className='text-[40px] font-bold mb-[0.6em]'>Approval Workflow</h2>
-                <div className='right-white-desc'>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+            <div className="flex-1 flex items-center h-full">
+              <div className="flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] px-[25px] py-[35px] rounded-[3em]">
+                <h2 className="text-[40px] font-bold mb-[0.6em]">Approval Workflow</h2>
+                <div className="leading-loose">
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
                     Multi-Level Review - Structured approval process
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
                     Instant Notifications - Get alerts for pending tasks
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
                     Comments & Feedback - Approvers leave notes
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
                     Secure Access - Role-based permissions
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
                     Audit Logs - Full transparency & tracking
                   </h3>
@@ -232,29 +249,31 @@ const ServicePage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <div className='service-posts__item--dark flex items-center bg-[#333333] h-[70vh] gap-[5em]'>
-            <div className='left-content-dark flex justify-end flex-1'>
-              <div className='left-dark-container'>
-                <h2 className='text-[40px] font-bold text-white mb-[0.6em]'>Finance & Reimbursement</h2>
-                <div className='left-dark-desc'>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+          <div
+            id='post-3'
+            className="flex items-center bg-[#333333] h-[70vh] gap-[5em]"
+          >
+            <div className="flex-1 flex justify-end">
+              <div>
+                <h2 className="text-white text-[40px] font-bold mb-[0.6em]">Finance & Reimbursement</h2>
+                <div className="leading-loose">
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Seamless Finance Integration - Hassle-free processing
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Expense Categories - Organized claim types
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Track Payouts - Monitor reimbursement status
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Financial Reports - Export claim summaries
                   </h3>
-                  <h3 className='text-white flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#DB545A" }} />
                     Flexible Payments - Multiple payout options
                   </h3>
@@ -284,46 +303,48 @@ const ServicePage: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <div className='right-content-dark flex items-center h-full'>
+            <div className="flex-1 flex items-center h-full">
               <img
-                className='h-[75%] rounded-[3em]'
-                src="https://static.wixstatic.com/media/11062b_d8c8c150557a41fb986c6162f2556939~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/03.jpg"
+                className="h-[75%] rounded-[3em]"
                 alt=""
+                src="https://static.wixstatic.com/media/11062b_d8c8c150557a41fb986c6162f2556939~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/03.jpg"
               />
             </div>
           </div>
-
-          <div className='service-posts__item--white flex items-center h-[70vh] gap-[3em]'>
-            <div className='left-content-white flex justify-end items-center h-full flex-1'>
+          <div
+            id='post-4'
+            className="flex items-center h-[70vh] gap-[3em]"
+          >
+            <div className="flex-1 flex justify-end items-center h-full">
               <img
-                className='h-[75%] rounded-[3em]'
-                src="https://static.wixstatic.com/media/11062b_7ffbcc1b69df473a86873f09a429a709~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_7ffbcc1b69df473a86873f09a429a709~mv2.jpg"
+                className="h-[75%] rounded-[3em]"
                 alt=""
+                src="https://static.wixstatic.com/media/11062b_7ffbcc1b69df473a86873f09a429a709~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/04.jpg"
               />
             </div>
-            <div className='right-content-white flex items-center h-full'>
-              <div className='right-white-container flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] p-[35px] [25px] rounded-[3em]'>
-                <h2 className='text-[40px] font-bold mb-[0.6em]'>User Experience</h2>
-                <div className='right-white-desc'>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+            <div className="flex-1 flex items-center h-full">
+              <div className="flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] px-[25px] py-[35px] rounded-[3em]">
+                <h2 className="text-[40px] font-bold mb-[0.6em]">Admin & Project Management</h2>
+                <div className="leading-loose">
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Easy Navigation - Intuitive and user-friendly
+                    User Roles - Manage permissions easily
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Mobile Optimized - Smooth experience on all devices
+                    Project-Based Claims - Link requests to projects
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Quick Access - Seamless login and claim submission
+                    Dashboard Insights - Key metrics at a glance
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Multiple Languages - Access in your preferred language
+                    Custom Workflows - Adapt to company needs
                   </h3>
-                  <h3 className='flex items-center gap-[10px] text-[18px]'>
+                  <h3 className="flex items-center gap-[10px] text-[18px]">
                     <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Real-Time Updates - Track your claim status anytime
+                    System Integration - Connect with existing tools
                   </h3>
                 </div>
                 <Button
@@ -353,6 +374,7 @@ const ServicePage: React.FC = () => {
             </div>
           </div>
         </div>
+
 
       </div>
       <Footer />

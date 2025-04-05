@@ -578,7 +578,7 @@ const ProfilePage: React.FC = () => {
               <div className='profile-information-content'>
                 {employee ? (
                   <form className='profile-information' onSubmit={handleSubmitEmployee(onSubmitEmployeeData)}>
-                    <div style={{ display: "flex", gap: "30px" }}>
+                    <div className='profile-edit-input'>
                       <div style={{ width: "50%" }}>
                         <label>Phone number:</label>
                         <input
@@ -612,7 +612,7 @@ const ProfilePage: React.FC = () => {
                         {errorsEmployee.account && <p style={{ color: "red", fontSize: "12px" }}>{errorsEmployee.account.message}</p>}
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: "30px" }}>
+                    <div className='profile-disabled-input'>
                       <div style={{ width: "50%" }}>
                         <label>Start date:</label>
                         <input
@@ -632,7 +632,7 @@ const ProfilePage: React.FC = () => {
                         />
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: "30px" }}>
+                    <div className='profile-edit-input'>
                       <div style={{ width: "50%" }}>
                         <label>Address:</label>
                         <input
