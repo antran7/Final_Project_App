@@ -22,10 +22,12 @@
   align-items: center;
   margin-bottom: 24px;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .search-field {
   flex: 1;
+  min-width: 200px;
 }
 
 .status-filter {
@@ -36,6 +38,7 @@
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  overflow-x: auto;
 }
 
 .action-buttons {
@@ -43,7 +46,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -106,6 +109,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .date-field {
@@ -114,4 +118,79 @@
 
 .MuiTableHead-root .MuiTableRow-root {
   background-color: #f3f4f6;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 1200px) {
+  .finance-content {
+    padding: 24px;
+  }
+
+  .finance-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .action-buttons .MuiButton-root {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .finance-content {
+    padding: 16px;
+  }
+
+  .finance-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .finance-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-field,
+  .status-filter,
+  .date-field {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .MuiTableCell-root {
+    padding: 8px;
+    font-size: 0.875rem;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .finance-content {
+    padding: 12px;
+  }
+
+  .finance-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .MuiTableCell-root {
+    padding: 6px;
+    font-size: 0.75rem;
+  }
+
+  .action-buttons .MuiButton-root {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+  }
 }
