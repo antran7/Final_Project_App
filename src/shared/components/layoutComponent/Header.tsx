@@ -69,10 +69,11 @@ const Header = ({ toggleSidebar = () => { } }: HeaderProps) => {
           <IconButton
             onClick={toggleSidebar}
             color="inherit"
-            style={{ marginRight: '10px' }}
+            className="menu-toggle"
           >
             <MenuIcon style={{ fontSize: '30px' }} />
           </IconButton>
+
         )}
         <h1
           className="animate__animated animate__fadeIn animate__infinite"

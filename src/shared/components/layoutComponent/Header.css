@@ -106,3 +106,46 @@
 .header-right-item:hover::after {
     height: 3px;
 }
+
+/* Tablet */
+@media screen and (max-width: 1024px) {
+    .layout-header {
+        padding: 15px 20px;
+    }
+
+    .layout-header-left h1 {
+        font-size: 24px;
+    }
+
+    .layout-header-right {
+        width: auto;
+        gap: 10px;
+    }
+
+    .header-right-item {
+        font-size: 14px;
+        padding: 4px 10px;
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    .layout-header {
+        padding: 15px 10px;
+    }
+
+    .layout-header-left {
+        font-size: 20px;
+        margin-left: 0;
+    }
+
+    .layout-header-right {
+        display: none;
+        /* Ẩn menu ngang ở mobile */
+    }
+
+    .layout-header .menu-toggle {
+        display: block;
+        /* Hiện icon menu */
+    }
+}
