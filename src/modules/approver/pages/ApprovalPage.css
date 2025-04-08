@@ -38,10 +38,12 @@
   align-items: center;
   margin-bottom: 24px;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .search-field {
   flex: 1;
+  min-width: 200px;
 }
 
 .status-filter {
@@ -52,6 +54,7 @@
   margin-bottom: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  overflow-x: auto;
 }
 
 .action-buttons {
@@ -59,7 +62,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -216,6 +219,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .date-field {
@@ -224,4 +228,106 @@
 
 .clear-date-btn {
   height: 40px;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 1200px) {
+  .approval-content {
+    padding: 24px;
+  }
+
+  .approval-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .approval-container {
+    padding: 16px;
+  }
+
+  .approval-content {
+    padding: 16px;
+  }
+
+  .approval-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .approval-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-field,
+  .status-filter,
+  .date-field {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .MuiTableCell-root {
+    padding: 8px;
+    font-size: 0.875rem;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  .custom-modal .modal-content {
+    padding: 24px;
+    width: 95%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .approval-container {
+    padding: 12px;
+  }
+
+  .approval-content {
+    padding: 12px;
+  }
+
+  .approval-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .MuiTableCell-root {
+    padding: 6px;
+    font-size: 0.75rem;
+  }
+
+  .action-buttons button {
+    font-size: 0.7rem;
+    padding: 2px 4px;
+  }
+
+  .custom-modal .modal-content {
+    padding: 16px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-button,
+  .cancel-button {
+    width: 100%;
+  }
 }
