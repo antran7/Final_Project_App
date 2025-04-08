@@ -21,6 +21,8 @@ import {
   ListItemIcon,
   ListItemText,
   Tooltip,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import axios from "axios";
 import { debounce } from "lodash";
@@ -154,7 +156,6 @@ const RequestPage = () => {
   const [isOpeningModal, setIsOpeningModal] = useState<boolean>(false);
   const [selectedApproverName, setSelectedApproverName] = useState<string>("");
   const [selectedProjectName, setSelectedProjectName] = useState<string>("");
-  // Removed unused userEmail state
   const [userId, setUserId] = useState<string | null>(null);
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
   const [requestToApprove, setRequestToApprove] = useState<string | null>(null);
@@ -191,8 +192,8 @@ const RequestPage = () => {
     mode: "onChange",
   });
 
-
- 
+  // Trạng thái loading tổng hợp
+  const isAnyLoading = loading || isAdding || isEditing || isFetchingLogs || isApproving || isCanceling || isOpeningModal || isFetchingUserInfo;
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -221,7 +222,6 @@ const RequestPage = () => {
       try {
         const currentUserEmail = localStorage.getItem("userEmail");
         if (currentUserEmail) {
-          
           const response = await axios.get(`${API_URL}/users/${currentUserEmail}`);
           setUserId(response.data.data._id);
         }
@@ -267,7 +267,6 @@ const RequestPage = () => {
     }
   };
 
-  // Debounce fetchRequests giống UserManagement
   const debouncedFetchRequests = useCallback(debounce(fetchRequests, 800), [
     search,
     selectedStatus,
@@ -937,11 +936,22 @@ const RequestPage = () => {
     fetchUserInfo(username);
   };
 
-  // Danh sách status đồng bộ
   const statusOptions = ["All", "Draft", "Pending Approval", "Rejected", "Approved", "Canceled"];
 
   return (
     <Layout>
+      {/* Global Loading Backdrop */}
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.modal + 1,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+        open={isAnyLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <div className="min-h-screen bg-gray-100">
         <div className="p-8">
           <div className="request-content">
@@ -954,13 +964,14 @@ const RequestPage = () => {
                   variant="outlined"
                   size="small"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)} // Gọi setSearch trực tiếp
+                  onChange={(e) => setSearch(e.target.value)}
                   className="search-field"
                   placeholder="Search by name..."
                   sx={{ width: "1000px" }}
+                  disabled={isAnyLoading}
                 />
                 <Autocomplete
-                  options={statusOptions} // Sử dụng danh sách status đồng bộ
+                  options={statusOptions}
                   value={selectedStatus || "All"}
                   onChange={(_, newValue) => {
                     setSelectedStatus(newValue || "All");
@@ -976,6 +987,7 @@ const RequestPage = () => {
                     />
                   )}
                   sx={{ minWidth: "200px" }}
+                  disabled={isAnyLoading}
                 />
               </div>
               {isOpeningModal ? (
@@ -994,7 +1006,7 @@ const RequestPage = () => {
                       backgroundColor: "#81eee8",
                     },
                   }}
-                  disabled={isOpeningModal}
+                  disabled={isAnyLoading}
                 >
                   + Add Request
                 </Button>
@@ -1081,6 +1093,7 @@ const RequestPage = () => {
                                   <IconButton
                                     onClick={() => handleEditClick(req)}
                                     sx={{ color: "#e6cb62", "&:hover": { color: "#eab308" } }}
+                                    disabled={isAnyLoading}
                                   >
                                     <EditIcon />
                                   </IconButton>
@@ -1089,6 +1102,7 @@ const RequestPage = () => {
                                   <IconButton
                                     onClick={() => handleRequestCancel(req._id)}
                                     sx={{ color: "#dc2626", "&:hover": { color: "#ef4444" } }}
+                                    disabled={isAnyLoading}
                                   >
                                     <CancelIcon />
                                   </IconButton>
@@ -1097,6 +1111,7 @@ const RequestPage = () => {
                                   <IconButton
                                     onClick={() => handleRequestApproval(req._id)}
                                     sx={{ color: "#46d179", "&:hover": { color: "#16a34a" } }}
+                                    disabled={isAnyLoading}
                                   >
                                     <SendIcon />
                                   </IconButton>
@@ -1107,6 +1122,7 @@ const RequestPage = () => {
                               <IconButton
                                 onClick={() => handleViewLogs(req._id)}
                                 sx={{ color: "#6b7280", "&:hover": { color: "#374151" } }}
+                                disabled={isAnyLoading}
                               >
                                 <HistoryIcon />
                               </IconButton>
@@ -1115,6 +1131,7 @@ const RequestPage = () => {
                               <IconButton
                                 onClick={(e) => handleDownloadClick(e, req)}
                                 sx={{ color: "#3b82f6", "&:hover": { color: "#2563eb" } }}
+                                disabled={isAnyLoading}
                               >
                                 <DownloadIcon />
                               </IconButton>
@@ -1124,13 +1141,13 @@ const RequestPage = () => {
                               open={Boolean(downloadAnchorEl)}
                               onClose={handleDownloadClose}
                             >
-                              <MenuItem onClick={handleDownloadExcel}>
+                              <MenuItem onClick={handleDownloadExcel} disabled={isAnyLoading}>
                                 <ListItemIcon>
                                   <TableChart fontSize="small" />
                                 </ListItemIcon>
                                 <ListItemText>Download Excel</ListItemText>
                               </MenuItem>
-                              <MenuItem onClick={handleDownloadPDF}>
+                              <MenuItem onClick={handleDownloadPDF} disabled={isAnyLoading}>
                                 <ListItemIcon>
                                   <PictureAsPdf fontSize="small" />
                                 </ListItemIcon>
@@ -1159,6 +1176,7 @@ const RequestPage = () => {
                   }}
                   showFirstButton
                   showLastButton
+                  disabled={isAnyLoading}
                 />
               </TableContainer>
             )}
@@ -1170,6 +1188,7 @@ const RequestPage = () => {
             onClose={handleModalCancel}
             maxWidth="md"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1190,6 +1209,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1217,6 +1237,7 @@ const RequestPage = () => {
                         margin="normal"
                         error={!!errors.claim_name}
                         helperText={errors.claim_name?.message}
+                        disabled={isAnyLoading}
                       />
                     )}
                   />
@@ -1256,6 +1277,7 @@ const RequestPage = () => {
                               }}
                             />
                           )}
+                          disabled={isAnyLoading}
                         />
                       </FormControl>
                     )}
@@ -1293,6 +1315,7 @@ const RequestPage = () => {
                               helperText={errors.approval_id?.message}
                             />
                           )}
+                          disabled={isAnyLoading}
                         />
                       </FormControl>
                     )}
@@ -1331,6 +1354,7 @@ const RequestPage = () => {
                                 helperText: errors.claim_start_date?.message,
                               },
                             }}
+                            disabled={isAnyLoading}
                           />
                         )}
                       />
@@ -1370,6 +1394,7 @@ const RequestPage = () => {
                                 helperText: errors.claim_end_date?.message,
                               },
                             }}
+                            disabled={isAnyLoading}
                           />
                         )}
                       />
@@ -1391,14 +1416,15 @@ const RequestPage = () => {
                         margin="normal"
                         error={!!errors.total_work_time}
                         helperText={errors.total_work_time?.message}
+                        disabled={isAnyLoading}
                       />
                     )}
                   />
                   <DialogActions sx={{ p: 0, mt: 3 }}>
-                    <Button onClick={handleModalCancel} variant="outlined" disabled={isAdding}>
+                    <Button onClick={handleModalCancel} variant="outlined" disabled={isAnyLoading}>
                       Cancel
                     </Button>
-                    <Button type="submit" variant="contained" color="primary" disabled={isAdding}>
+                    <Button type="submit" variant="contained" color="primary" disabled={isAnyLoading}>
                       Add
                     </Button>
                   </DialogActions>
@@ -1413,6 +1439,7 @@ const RequestPage = () => {
             onClose={handleModalCancel}
             maxWidth="md"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1433,6 +1460,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1458,6 +1486,7 @@ const RequestPage = () => {
                         margin="normal"
                         error={!!errors.claim_name}
                         helperText={errors.claim_name?.message}
+                        disabled={isAnyLoading}
                       />
                     )}
                   />
@@ -1497,6 +1526,7 @@ const RequestPage = () => {
                               }}
                             />
                           )}
+                          disabled={isAnyLoading}
                         />
                       </FormControl>
                     )}
@@ -1534,6 +1564,7 @@ const RequestPage = () => {
                               helperText={errors.approval_id?.message}
                             />
                           )}
+                          disabled={isAnyLoading}
                         />
                       </FormControl>
                     )}
@@ -1572,6 +1603,7 @@ const RequestPage = () => {
                                 helperText: errors.claim_start_date?.message,
                               },
                             }}
+                            disabled={isAnyLoading}
                           />
                         )}
                       />
@@ -1611,6 +1643,7 @@ const RequestPage = () => {
                                 helperText: errors.claim_end_date?.message,
                               },
                             }}
+                            disabled={isAnyLoading}
                           />
                         )}
                       />
@@ -1632,14 +1665,15 @@ const RequestPage = () => {
                         margin="normal"
                         error={!!errors.total_work_time}
                         helperText={errors.total_work_time?.message}
+                        disabled={isAnyLoading}
                       />
                     )}
                   />
                   <DialogActions sx={{ p: 0, mt: 3 }}>
-                    <Button onClick={handleModalCancel} variant="outlined" disabled={isEditing}>
+                    <Button onClick={handleModalCancel} variant="outlined" disabled={isAnyLoading}>
                       Cancel
                     </Button>
-                    <Button type="submit" variant="contained" color="primary" disabled={isEditing}>
+                    <Button type="submit" variant="contained" color="primary" disabled={isAnyLoading}>
                       Save Changes
                     </Button>
                   </DialogActions>
@@ -1654,6 +1688,7 @@ const RequestPage = () => {
             onClose={() => setIsConfirmModalVisible(false)}
             maxWidth="sm"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1674,6 +1709,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1695,7 +1731,7 @@ const RequestPage = () => {
               <Button
                 onClick={() => setIsConfirmModalVisible(false)}
                 variant="outlined"
-                disabled={isApproving}
+                disabled={isAnyLoading}
               >
                 Cancel
               </Button>
@@ -1703,7 +1739,7 @@ const RequestPage = () => {
                 onClick={handleConfirmApproval}
                 variant="contained"
                 color="primary"
-                disabled={isApproving}
+                disabled={isAnyLoading}
               >
                 Confirm
               </Button>
@@ -1716,6 +1752,7 @@ const RequestPage = () => {
             onClose={() => setIsDeleteModalVisible(false)}
             maxWidth="sm"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1736,6 +1773,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1757,7 +1795,7 @@ const RequestPage = () => {
               <Button
                 onClick={() => setIsDeleteModalVisible(false)}
                 variant="outlined"
-                disabled={isCanceling}
+                disabled={isAnyLoading}
               >
                 Cancel
               </Button>
@@ -1765,7 +1803,7 @@ const RequestPage = () => {
                 onClick={handleConfirmCancel}
                 variant="contained"
                 color="error"
-                disabled={isCanceling}
+                disabled={isAnyLoading}
               >
                 Confirm
               </Button>
@@ -1778,6 +1816,7 @@ const RequestPage = () => {
             onClose={() => setIsLogModalVisible(false)}
             maxWidth="md"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1798,6 +1837,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1869,7 +1909,7 @@ const RequestPage = () => {
                                       textDecoration: "underline",
                                     },
                                   }}
-                                  disabled={loadingUser === log.updated_by}
+                                  disabled={loadingUser === log.updated_by || isAnyLoading}
                                 >
                                   {log.updated_by}
                                 </Button>
@@ -1898,7 +1938,7 @@ const RequestPage = () => {
               <Button
                 onClick={() => setIsLogModalVisible(false)}
                 variant="outlined"
-                disabled={isFetchingLogs}
+                disabled={isAnyLoading}
               >
                 Close
               </Button>
@@ -1911,6 +1951,7 @@ const RequestPage = () => {
             onClose={handleCloseUserInfoModal}
             maxWidth="sm"
             fullWidth
+            disableEscapeKeyDown={isAnyLoading}
           >
             <DialogTitle
               sx={{
@@ -1931,6 +1972,7 @@ const RequestPage = () => {
                   top: 8,
                   color: (theme) => theme.palette.grey[500],
                 }}
+                disabled={isAnyLoading}
               >
                 <CloseIcon />
               </IconButton>
@@ -1967,7 +2009,7 @@ const RequestPage = () => {
               <Button
                 onClick={handleCloseUserInfoModal}
                 variant="outlined"
-                disabled={isFetchingUserInfo}
+                disabled={isAnyLoading}
               >
                 Close
               </Button>
