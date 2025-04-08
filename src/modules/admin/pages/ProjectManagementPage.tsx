@@ -84,6 +84,7 @@ const ProjectManagementPage: React.FC = () => {
   );
   const [showUserDropdown, setShowUserDropdown] = useState<number | null>(null);
   const [isRolesLoaded, setIsRolesLoaded] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -270,12 +271,14 @@ const ProjectManagementPage: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (selectedProjectId) {
       try {
+        setDeleteLoading(true);
         await deleteProject(selectedProjectId);
         setProjects((prev) => prev.filter((p) => p._id !== selectedProjectId));
         toast.success("Project deleted successfully!");
       } catch {
         toast.error("Failed to delete project");
       } finally {
+        setDeleteLoading(false);
         setConfirmDialogOpen(false);
         setSelectedProjectId(null);
       }
@@ -865,6 +868,7 @@ const ProjectManagementPage: React.FC = () => {
             </Button>
             <Button
               onClick={handleConfirmDelete}
+              disabled={deleteLoading}
               sx={{
                 backgroundColor: "gray",
                 color: "white",
@@ -872,7 +876,15 @@ const ProjectManagementPage: React.FC = () => {
               }}
               variant="contained"
             >
-              Confirm
+              {deleteLoading ? (
+                <div className="flex justify-center flex-row gap-2">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              ) : (
+                "Confirm"
+              )}
             </Button>
           </DialogActions>
         </Dialog>
