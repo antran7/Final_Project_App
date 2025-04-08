@@ -59,6 +59,7 @@ const PaidPage = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
+  const [modalLoading, setModalLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
@@ -167,7 +168,7 @@ const PaidPage = () => {
 
   const handlePaid = async (claim: Claim) => {
     try {
-      setLoading(true);
+      setModalLoading(true);
       const response = await axios.put(
         `${API_URL}/claims/change-status`,
         {
@@ -183,15 +184,12 @@ const PaidPage = () => {
       );
 
       if (response.data.success) {
-        setClaims((prevClaims) =>
-          prevClaims.map((c) =>
-            c._id === claim._id ? { ...c, claim_status: "Paid" } : c
-          )
-        );
         toast.success("Payment processed successfully!", {
           icon: "✅",
         });
-        fetchClaims(); // Refresh the data
+        handleCloseConfirmDialog();
+        setLoading(true);
+        fetchClaims();
       }
     } catch (error) {
       console.error("Error marking as paid:", error);
@@ -199,8 +197,7 @@ const PaidPage = () => {
         icon: "❌",
       });
     } finally {
-      setLoading(false);
-      handleCloseConfirmDialog();
+      setModalLoading(false);
     }
   };
 
@@ -529,7 +526,7 @@ const PaidPage = () => {
           <div className="finance-content">
             <h1 className="finance-title">Finance Claims Management</h1>
 
-            <div className="finance-filters">
+            <div className="approval-filters">
               <TextField
                 label="Search"
                 variant="outlined"
@@ -543,24 +540,26 @@ const PaidPage = () => {
                 }}
               />
 
-              <Button
-                variant="contained"
-                size="small"
-                onClick={handleDownloadAllClick}
-                sx={{
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#2563eb",
+              {claims.length > 0 && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={handleDownloadAllClick}
+                  sx={{
+                    backgroundColor: "#3b82f6",
                     color: "white",
-                  },
-                  textTransform: "none",
-                  ml: 2,
-                }}
-                startIcon={<Download />}
-              >
-                Download All
-              </Button>
+                    "&:hover": {
+                      backgroundColor: "#2563eb",
+                      color: "white",
+                    },
+                    textTransform: "none",
+                    ml: 2,
+                  }}
+                  startIcon={<Download />}
+                >
+                  Download All
+                </Button>
+              )}
             </div>
 
             {loading ? (
@@ -755,13 +754,24 @@ const PaidPage = () => {
           Confirm Payment
         </DialogTitle>
         <DialogContent sx={{ padding: "20px 24px" }}>
-          Are you sure you want to mark this claim as paid?
+          {modalLoading ? (
+            <div className="flex justify-center items-center min-h-[60px]">
+              <div className="flex justify-center flex-row gap-2 mt-4">
+                <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce"></div>
+                <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                <div className="w-3 h-3 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+              </div>
+            </div>
+          ) : (
+            "Are you sure you want to mark this claim as paid?"
+          )}
         </DialogContent>
         <DialogActions sx={{ padding: "20px 24px" }}>
           <Button
             onClick={handleCloseConfirmDialog}
             color="primary"
             sx={{ fontSize: "16px" }}
+            disabled={modalLoading}
           >
             Cancel
           </Button>
@@ -770,6 +780,7 @@ const PaidPage = () => {
             color="primary"
             variant="contained"
             sx={{ fontSize: "16px" }}
+            disabled={modalLoading}
           >
             Confirm
           </Button>

@@ -57,12 +57,14 @@ const ApprovalPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalReason, setModalReason] = useState("");
+  const [reasonError, setReasonError] = useState(false);
   const [currentClaimId, setCurrentClaimId] = useState<string | null>(null);
   const [currentAction, setCurrentAction] = useState<
     "Approved" | "Rejected" | "Draft" | null
   >(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modalLoading, setModalLoading] = useState(false);
   const [token, setToken] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -186,15 +188,17 @@ const ApprovalPage: React.FC = () => {
   const handleModalSubmit = async () => {
     if (!currentClaimId || !currentAction) return;
 
-    // Reset modal state immediately
-    setIsModalOpen(false);
-    setModalReason("");
-    setCurrentClaimId(null);
-    setCurrentAction(null);
+    // Validate reason for reject and return actions
+    if (currentAction !== "Approved" && !modalReason.trim()) {
+      setReasonError(true);
+      return;
+    }
+
     setError(null);
+    setReasonError(false);
 
     try {
-      setLoading(true);
+      setModalLoading(true);
       const payload = {
         _id: currentClaimId,
         claim_status: currentAction,
@@ -235,6 +239,13 @@ const ApprovalPage: React.FC = () => {
           }
         );
 
+        // Close modal and reset state only after successful operation
+        setIsModalOpen(false);
+        setModalReason("");
+        setCurrentClaimId(null);
+        setCurrentAction(null);
+        setReasonError(false);
+
         // Refresh data
         fetchClaims();
       }
@@ -247,8 +258,14 @@ const ApprovalPage: React.FC = () => {
           icon: "❌",
         }
       );
+      // Reset modal state on error
+      setIsModalOpen(false);
+      setModalReason("");
+      setCurrentClaimId(null);
+      setCurrentAction(null);
+      setReasonError(false);
     } finally {
-      setLoading(false);
+      setModalLoading(false);
     }
   };
 
@@ -258,6 +275,7 @@ const ApprovalPage: React.FC = () => {
     setCurrentClaimId(null);
     setCurrentAction(null);
     setError(null);
+    setReasonError(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -614,23 +632,25 @@ const ApprovalPage: React.FC = () => {
               placeholder="Search by claim name"
             />
 
-            <Button
-              variant="contained"
-              size="small"
-              onClick={handleDownloadAllClick}
-              sx={{
-                backgroundColor: "#3b82f6",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#2563eb",
-                },
-                textTransform: "none",
-                ml: 2,
-              }}
-              startIcon={<Download />}
-            >
-              Download All
-            </Button>
+            {filteredClaims.length > 0 && (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleDownloadAllClick}
+                sx={{
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#2563eb",
+                  },
+                  textTransform: "none",
+                  ml: 2,
+                }}
+                startIcon={<Download />}
+              >
+                Download All
+              </Button>
+            )}
           </div>
 
           <TableContainer
@@ -878,36 +898,77 @@ const ApprovalPage: React.FC = () => {
               <CloseIcon />
             </IconButton>
           </DialogTitle>
-          <DialogContent sx={{ p: 3 }}>
-            {" "}
-            {currentAction !== "Approved" && (
-              <>
-                <p className="modal-instruction">
-                  Please provide a reason for this action:
-                </p>
-                <TextField
-                  multiline
-                  rows={6}
-                  value={modalReason}
-                  onChange={(e) => setModalReason(e.target.value)}
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                  placeholder="Enter your reason here..."
-                  required
-                  sx={{ mt: 2 }}
-                />
-              </>
+          <DialogContent
+            sx={{
+              p: 3,
+              minHeight: "200px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {modalLoading ? (
+              <div className="flex justify-center items-center">
+                <div className="flex justify-center flex-row gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.3s]"></div>
+                  <div className="w-4 h-4 rounded-full bg-gray-700 animate-bounce [animation-delay:-.5s]"></div>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full">
+                {currentAction !== "Approved" && (
+                  <>
+                    <p className="modal-instruction">
+                      Please provide a reason for this action:
+                    </p>
+                    <TextField
+                      multiline
+                      rows={6}
+                      value={modalReason}
+                      onChange={(e) => {
+                        setModalReason(e.target.value);
+                        setReasonError(false);
+                      }}
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      placeholder="Enter your reason here..."
+                      required
+                      error={reasonError}
+                      helperText={reasonError ? "Reason is required" : ""}
+                      sx={{
+                        mt: 2,
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderColor: reasonError
+                              ? "#d32f2f"
+                              : "rgba(0, 0, 0, 0.23)",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: reasonError
+                              ? "#d32f2f"
+                              : "rgba(0, 0, 0, 0.23)",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: reasonError ? "#d32f2f" : "#1976d2",
+                          },
+                        },
+                      }}
+                    />
+                  </>
+                )}
+                {currentAction === "Approved" && (
+                  <p
+                    className="modal-instruction"
+                    style={{ marginTop: "40px", fontSize: "1.25rem" }}
+                  >
+                    Are you sure you want to approve this claim?
+                  </p>
+                )}
+                {error && <p className="error-message">{error}</p>}
+              </div>
             )}
-            {currentAction === "Approved" && (
-              <p
-                className="modal-instruction"
-                style={{ marginTop: "40px", fontSize: "1.25rem" }}
-              >
-                Are you sure you want to approve this claim?
-              </p>
-            )}
-            {error && <p className="error-message">{error}</p>}
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
             <Button
@@ -921,6 +982,7 @@ const ApprovalPage: React.FC = () => {
                   backgroundColor: "rgba(0, 0, 0, 0.04)",
                 },
               }}
+              disabled={modalLoading}
             >
               Cancel
             </Button>
@@ -946,6 +1008,7 @@ const ApprovalPage: React.FC = () => {
                 },
                 minWidth: "100px",
               }}
+              disabled={modalLoading}
             >
               {currentAction === "Approved" ? "Approve" : "Submit"}
             </Button>
