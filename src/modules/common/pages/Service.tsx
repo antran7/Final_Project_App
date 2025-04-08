@@ -57,324 +57,199 @@ const ServicePage: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center w-full mb-[10%]">
-          <h2 className="text-[50px] font-bold text-[#1C3637] mb-[1.5em]">What We Do</h2>
-          <div className="flex flex-col justify-center gap-[2.5em] w-full">
-            <div className="flex pl-[10%]">
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">CLAIM PROCESSING</h3>
+          <h2 className="text-[40px] md:text-[50px] font-bold text-[#1C3637] mb-[1.5em] text-center">What We Do</h2>
+          <div className="flex flex-col justify-center gap-[2.5em] w-full px-4 md:px-[5%]">
+            {/* Group 1 */}
+            <div className="flex flex-wrap gap-6 justify-center">
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">CLAIM PROCESSING</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Create and submit claim requests</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Attach supporting documents</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Track claim request status</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> View claim request history</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Create and submit claim requests</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Attach supporting documents</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Track claim request status</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> View claim request history</li>
                 </ul>
               </div>
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">APPROVAL WORKFLOW</h3>
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">APPROVAL WORKFLOW</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Review and approve/reject claims</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Add comments and feedback</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Automatic notifications for pending approvals</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Multi-level approval process</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Review and approve/reject claims</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Add comments and feedback</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Automatic notifications for pending approvals</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Multi-level approval process</li>
                 </ul>
               </div>
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">FINANCE HANDLING</h3>
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">FINANCE HANDLING</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Process approved claims for payment</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Generate financial reports</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Track payment status</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Ensure compliance with company policies</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Process approved claims for payment</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Generate financial reports</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Track payment status</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Ensure compliance with company policies</li>
                 </ul>
               </div>
             </div>
 
-            <div className="flex pl-[10%]">
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">USER & PROJECT MANAGEMENT</h3>
+            {/* Group 2 */}
+            <div className="flex flex-wrap gap-6 justify-center">
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">USER & PROJECT MANAGEMENT</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Manage user accounts and roles</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Assign approvers and finance handlers</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Monitor claim activities per project</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Control access and permissions</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Manage user accounts and roles</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Assign approvers and finance handlers</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Monitor claim activities per project</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Control access and permissions</li>
                 </ul>
               </div>
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">REPORTING & ANALYTICS</h3>
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">REPORTING & ANALYTICS</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Generate real-time claim reports</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Track claim trends and insights</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Export data for auditing</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Visualize claim performance</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Generate real-time claim reports</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Track claim trends and insights</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Export data for auditing</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Visualize claim performance</li>
                 </ul>
               </div>
-              <div className="flex-1">
-                <h3 className="text-[23px] mb-[1em]">SECURITY & COMPLIANCE</h3>
+              <div className="w-full sm:w-[48%] lg:w-[30%]">
+                <h3 className="text-[20px] md:text-[23px] mb-[1em]">SECURITY & COMPLIANCE</h3>
                 <ul>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Role-based access control (RBAC)</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Secure data encryption</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Compliance with financial regulations</li>
-                  <li className="text-[20px] leading-[2]"><AddIcon /> Audit logs for all activities</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Role-based access control (RBAC)</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Secure data encryption</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Compliance with financial regulations</li>
+                  <li className="text-[18px] md:text-[20px] leading-[2]"><AddIcon /> Audit logs for all activities</li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col w-full mb-[10%]">
-          {/* DARK BLOCK 1 */}
-          <div
-            id='post-1'
-            className="flex items-center bg-[#333333] h-[70vh] gap-[5em]"
-          >
-            <div className="flex-1 flex justify-end">
-              <div>
-                <h2 className="text-white text-[40px] font-bold mb-[0.6em]">Streamlined Claim Processing</h2>
-                <div className="leading-loose">
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Fast Submission - Submit claims in seconds
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    File Attachments - Upload receipts & invoices
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Live Tracking - Check status anytime
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Claim History - View past requests
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Auto-Validation - Reduce errors instantly
-                  </h3>
-                </div>
-                <Button
-                  variant="contained"
-                  disableElevation
-                  sx={{
-                    background: "transparent",
-                    color: "#eee",
-                    fontWeight: "bold",
-                    padding: "15px 35px",
-                    border: "2px solid white",
-                    borderRadius: "30px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    marginTop: "1.5em",
-                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "white",
-                      color: "#333",
-                    },
-                  }}
-                >
-                  Learn more
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 flex items-center h-full">
-              <img
-                className="h-[75%] rounded-[3em]"
-                alt=""
-                src="https://static.wixstatic.com/media/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg"
-              />
-            </div>
-          </div>
 
-          {/* WHITE BLOCK 2 */}
-          <div
-            id='post-2'
-            className="flex items-center h-[70vh] gap-[3em]"
-          >
-            <div className="flex-1 flex justify-end items-center h-full">
-              <img
-                className="h-[75%] rounded-[3em]"
-                alt=""
-                src="https://static.wixstatic.com/media/11062b_aa4665bc130a49728ebf3c1e65dd90e6~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/02.jpg"
-              />
-            </div>
-            <div className="flex-1 flex items-center h-full">
-              <div className="flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] px-[25px] py-[35px] rounded-[3em]">
-                <h2 className="text-[40px] font-bold mb-[0.6em]">Approval Workflow</h2>
-                <div className="leading-loose">
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Multi-Level Review - Structured approval process
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Instant Notifications - Get alerts for pending tasks
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Comments & Feedback - Approvers leave notes
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Secure Access - Role-based permissions
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Audit Logs - Full transparency & tracking
-                  </h3>
+        <div className="w-full bg-white py-16 space-y-24">
+          {[
+            {
+              id: "post-1",
+              dark: true,
+              title: "Streamlined Claim Processing",
+              list: [
+                "Fast Submission - Submit claims in seconds",
+                "File Attachments - Upload receipts & invoices",
+                "Live Tracking - Check status anytime",
+                "Claim History - View past requests",
+                "Auto-Validation - Reduce errors instantly",
+              ],
+              img: "https://static.wixstatic.com/media/11062b_f0010cf224904e5383ed94bd38b873ab~mv2.jpg",
+              iconColor: "#DB545A",
+            },
+            {
+              id: "post-2",
+              dark: false,
+              title: "Approval Workflow",
+              list: [
+                "Multi-Level Review - Structured approval process",
+                "Instant Notifications - Get alerts for pending tasks",
+                "Comments & Feedback - Approvers leave notes",
+                "Secure Access - Role-based permissions",
+                "Audit Logs - Full transparency & tracking",
+              ],
+              img: "https://static.wixstatic.com/media/11062b_aa4665bc130a49728ebf3c1e65dd90e6~mv2.jpg",
+              iconColor: "#86AFC0",
+            },
+            {
+              id: "post-3",
+              dark: true,
+              title: "Finance & Reimbursement",
+              list: [
+                "Seamless Finance Integration - Hassle-free processing",
+                "Expense Categories - Organized claim types",
+                "Track Payouts - Monitor reimbursement status",
+                "Financial Reports - Export claim summaries",
+                "Flexible Payments - Multiple payout options",
+              ],
+              img: "https://static.wixstatic.com/media/11062b_d8c8c150557a41fb986c6162f2556939~mv2.jpg",
+              iconColor: "#DB545A",
+            },
+            {
+              id: "post-4",
+              dark: false,
+              title: "Smart Notifications",
+              list: [
+                "Timely Alerts - Keep everyone informed",
+                "Email & In-app - Choose your channel",
+                "Real-Time Updates - Never miss a change",
+                "Custom Reminders - Stay on top of tasks",
+                "User Preferences - Personalized alerts",
+              ],
+              img: "https://static.wixstatic.com/media/11062b_7ffbcc1b69df473a86873f09a429a709~mv2.jpg",
+              iconColor: "#86AFC0",
+            },
+          ].map((section, index) => {
+            const isReverse = index % 2 === 1;
+            return (
+              <div
+                key={section.id}
+                id={section.id}
+                className={`flex flex-col-reverse lg:flex-row ${isReverse ? "lg:flex-row-reverse" : ""
+                  } items-center gap-16 px-6 lg:px-12 ${section.dark ? "bg-[#1F1F1F] text-white" : "bg-[#F9FAFB] text-gray-800"
+                  } py-16 rounded-[2em] max-w-screen-xl mx-auto shadow-md`}
+              >
+                {/* Text */}
+                <div className="flex-1 text-center lg:text-left space-y-5 max-w-xl">
+                  <h2 className="text-3xl lg:text-4xl font-bold">{section.title}</h2>
+                  <ul className="space-y-3">
+                    {section.list.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-base">
+                        <CheckIcon sx={{ color: section.iconColor }} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    className={`mt-6 inline-block px-6 py-3 border-2 rounded-full font-semibold text-lg transition-all duration-300 ${section.dark
+                        ? "text-white border-white hover:bg-white hover:text-[#1F1F1F]"
+                        : `text-[${section.iconColor}] border-[${section.iconColor}] hover:bg-[${section.iconColor}] hover:text-white`
+                      }`}
+                  >
+                    Learn more
+                  </button>
                 </div>
-                <Button
-                  variant="contained"
-                  disableElevation
-                  sx={{
-                    background: "transparent",
-                    color: "#86AFC0",
-                    fontWeight: "bold",
-                    padding: "15px 35px",
-                    border: "2px solid #86AFC0",
-                    borderRadius: "30px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    marginTop: "1.5em",
-                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#86AFC0",
-                      color: "white",
-                    },
-                  }}
-                >
-                  Learn more
-                </Button>
-              </div>
-            </div>
-          </div>
-          <div
-            id='post-3'
-            className="flex items-center bg-[#333333] h-[70vh] gap-[5em]"
-          >
-            <div className="flex-1 flex justify-end">
-              <div>
-                <h2 className="text-white text-[40px] font-bold mb-[0.6em]">Finance & Reimbursement</h2>
-                <div className="leading-loose">
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Seamless Finance Integration - Hassle-free processing
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Expense Categories - Organized claim types
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Track Payouts - Monitor reimbursement status
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Financial Reports - Export claim summaries
-                  </h3>
-                  <h3 className="text-white flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#DB545A" }} />
-                    Flexible Payments - Multiple payout options
-                  </h3>
+
+                {/* Image */}
+                <div className="flex-1 flex justify-center">
+                  <img
+                    src={section.img}
+                    alt=""
+                    className="w-full max-w-md rounded-3xl shadow-lg transition-transform duration-300 hover:scale-105 object-cover"
+                  />
                 </div>
-                <Button
-                  variant="contained"
-                  disableElevation
-                  sx={{
-                    background: "transparent",
-                    color: "#eee",
-                    fontWeight: "bold",
-                    padding: "15px 35px",
-                    border: "2px solid white",
-                    borderRadius: "30px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    marginTop: "1.5em",
-                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "white",
-                      color: "#333",
-                    },
-                  }}
-                >
-                  Learn more
-                </Button>
               </div>
-            </div>
-            <div className="flex-1 flex items-center h-full">
-              <img
-                className="h-[75%] rounded-[3em]"
-                alt=""
-                src="https://static.wixstatic.com/media/11062b_d8c8c150557a41fb986c6162f2556939~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/03.jpg"
-              />
-            </div>
-          </div>
-          <div
-            id='post-4'
-            className="flex items-center h-[70vh] gap-[3em]"
-          >
-            <div className="flex-1 flex justify-end items-center h-full">
-              <img
-                className="h-[75%] rounded-[3em]"
-                alt=""
-                src="https://static.wixstatic.com/media/11062b_7ffbcc1b69df473a86873f09a429a709~mv2.jpg/v1/fill/w_470,h_295,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/04.jpg"
-              />
-            </div>
-            <div className="flex-1 flex items-center h-full">
-              <div className="flex flex-col justify-center bg-[#F1F6F9] w-fit h-[75%] px-[25px] py-[35px] rounded-[3em]">
-                <h2 className="text-[40px] font-bold mb-[0.6em]">Admin & Project Management</h2>
-                <div className="leading-loose">
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    User Roles - Manage permissions easily
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Project-Based Claims - Link requests to projects
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Dashboard Insights - Key metrics at a glance
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    Custom Workflows - Adapt to company needs
-                  </h3>
-                  <h3 className="flex items-center gap-[10px] text-[18px]">
-                    <CheckIcon sx={{ color: "#86AFC0" }} />
-                    System Integration - Connect with existing tools
-                  </h3>
-                </div>
-                <Button
-                  variant="contained"
-                  disableElevation
-                  sx={{
-                    background: "transparent",
-                    color: "#86AFC0",
-                    fontWeight: "bold",
-                    padding: "15px 35px",
-                    border: "2px solid #86AFC0",
-                    borderRadius: "30px",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    marginTop: "1.5em",
-                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      backgroundColor: "#86AFC0",
-                      color: "white",
-                    },
-                  }}
-                >
-                  Learn more
-                </Button>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
 
+
+        <div className="flex flex-col items-center mb-[8%]">
+          <h2 className="text-[40px] text-[#1C3637] font-bold mb-[20px] text-center">
+            Ready to streamline your claim process?
+          </h2>
+          <p className="text-[18px] text-center w-[60%] mb-[30px]">
+            Get started today and experience the ease of automated, transparent, and secure claim handling from request to reimbursement.
+          </p>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#1C3637",
+              padding: "10px 30px",
+              fontSize: "16px",
+              borderRadius: "50px",
+              textTransform: "none",
+              ":hover": {
+                backgroundColor: "#345D5F",
+              },
+            }}
+          >
+            Get Started
+          </Button>
+        </div>
 
       </div>
       <Footer />
