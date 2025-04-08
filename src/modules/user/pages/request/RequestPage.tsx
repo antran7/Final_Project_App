@@ -154,7 +154,7 @@ const RequestPage = () => {
   const [isOpeningModal, setIsOpeningModal] = useState<boolean>(false);
   const [selectedApproverName, setSelectedApproverName] = useState<string>("");
   const [selectedProjectName, setSelectedProjectName] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string>("");
+  // Removed unused userEmail state
   const [userId, setUserId] = useState<string | null>(null);
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
   const [requestToApprove, setRequestToApprove] = useState<string | null>(null);
@@ -191,6 +191,9 @@ const RequestPage = () => {
     mode: "onChange",
   });
 
+
+ 
+
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     console.log("Stored token:", storedToken);
@@ -218,7 +221,7 @@ const RequestPage = () => {
       try {
         const currentUserEmail = localStorage.getItem("userEmail");
         if (currentUserEmail) {
-          setUserEmail(currentUserEmail);
+          
           const response = await axios.get(`${API_URL}/users/${currentUserEmail}`);
           setUserId(response.data.data._id);
         }
@@ -264,11 +267,18 @@ const RequestPage = () => {
     }
   };
 
+  // Debounce fetchRequests giống UserManagement
+  const debouncedFetchRequests = useCallback(debounce(fetchRequests, 800), [
+    search,
+    selectedStatus,
+    page,
+    rowsPerPage,
+  ]);
+
   useEffect(() => {
-    if (userId && token) {
-      fetchRequests();
-    }
-  }, [userEmail, userId, token, page, rowsPerPage, search, selectedStatus]);
+    debouncedFetchRequests();
+    return () => debouncedFetchRequests.cancel();
+  }, [debouncedFetchRequests]);
 
   const fetchProjects = async (keyword: string = "") => {
     try {
@@ -927,6 +937,9 @@ const RequestPage = () => {
     fetchUserInfo(username);
   };
 
+  // Danh sách status đồng bộ
+  const statusOptions = ["All", "Draft", "Pending Approval", "Rejected", "Approved", "Canceled"];
+
   return (
     <Layout>
       <div className="min-h-screen bg-gray-100">
@@ -941,13 +954,13 @@ const RequestPage = () => {
                   variant="outlined"
                   size="small"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target.value)} // Gọi setSearch trực tiếp
                   className="search-field"
                   placeholder="Search by name..."
                   sx={{ width: "1000px" }}
                 />
                 <Autocomplete
-                  options={["All", "Draft", "Pending Approval", "Rejected", "Approved", "Canceled"]}
+                  options={statusOptions} // Sử dụng danh sách status đồng bộ
                   value={selectedStatus || "All"}
                   onChange={(_, newValue) => {
                     setSelectedStatus(newValue || "All");
@@ -1827,10 +1840,22 @@ const RequestPage = () => {
                               {moment(log.updated_at).format("DD/MM/YYYY HH:mm:ss")}
                             </TableCell>
                             <TableCell align="center" sx={tableCellStyle}>
-                              {log.old_status}
+                              <span
+                                className={`status-badge status-${log.old_status
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")}`}
+                              >
+                                {log.old_status}
+                              </span>
                             </TableCell>
                             <TableCell align="center" sx={tableCellStyle}>
-                              {log.new_status}
+                              <span
+                                className={`status-badge status-${log.new_status
+                                  .toLowerCase()
+                                  .replace(/\s+/g, "-")}`}
+                              >
+                                {log.new_status}
+                              </span>
                             </TableCell>
                             <TableCell align="center" sx={tableCellStyle}>
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
