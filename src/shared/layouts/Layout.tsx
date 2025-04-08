@@ -19,10 +19,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const mainPadding = isHomePage ? "" : "pt-[50px]";
 
   return (
-    <div className="flex min-h-screen">
-      <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className="flex flex-col min-h-screen md:flex-row">
+      {/* Sidebar: ẩn trên mobile nếu chưa mở */}
+      <div
+        className={`fixed md:static z-50 transition-transform duration-300 ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      </div>
 
-      <div className="flex-1 flex flex-col">
+      {/* Nội dung chính */}
+      <div className="flex-1 flex flex-col overflow-x-hidden">
         <Header toggleSidebar={toggleSidebar} />
         <main className={`flex-1 bg-white ${mainPadding}`}>{children}</main>
       </div>

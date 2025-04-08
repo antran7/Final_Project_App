@@ -389,3 +389,119 @@
   flex-direction: column;
   align-items: center;
 }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .profile-page-content {
+    .profile-page-board {
+      width: 90%;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .profile-left-panel {
+      margin: 0 0 20px 0;
+      width: 100%;
+    }
+
+    .profile-right-top-panel,
+    .profile-right-bottom-panel {
+      margin: 0 0 20px 0;
+      width: 100%;
+    }
+
+    .profile-page-board::before,
+    .profile-page-board::after {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-page-title h2 {
+    font-size: 24px;
+  }
+
+  .profile-left-panel .profile-avatar {
+    width: 150px;
+    height: 150px;
+  }
+
+  .profile-left-panel .update-form input {
+    font-size: 14px;
+  }
+
+  .profile-left-panel .update-form button,
+  .profile-information button {
+    min-width: 140px;
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+
+  .profile-information-title,
+  .my-projects-title {
+    padding: 15px 20px;
+  }
+
+  .profile-information-content,
+  .my-projects-list {
+    padding: 10px 20px;
+  }
+
+  .profile-disabled-input,
+  .profile-edit-input {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .my-projects-list {
+    height: auto;
+    max-height: 300px;
+  }
+
+  .view-project-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .profile-page-content::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-left-panel .update-form {
+    width: 100%;
+  }
+
+  .profile-left-panel .update-form input {
+    font-size: 13px;
+  }
+
+  .profile-left-panel .update-form .activate-info {
+    flex-direction: column;
+    align-items: flex-start;
+
+    div {
+      margin: 10px 0 0 0;
+    }
+  }
+
+  .profile-page-title {
+    padding: 5px 10px;
+  }
+
+  .profile-page-title h2 {
+    font-size: 20px;
+  }
+
+  .profile-page-board {
+    padding: 10px;
+  }
+
+  .my-projects-list .MuiListItemText-primary {
+    font-size: 16px;
+  }
+}

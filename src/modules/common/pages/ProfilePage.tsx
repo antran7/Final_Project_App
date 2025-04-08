@@ -680,7 +680,7 @@ const ProfilePage: React.FC = () => {
               <div className='my-projects-title'>
                 {employee ? (
                   <>
-                    <h3>My involved projects</h3>
+                    <h3>My projects</h3>
                     <button type='button'>Filter by</button>
                   </>
                 ) : (

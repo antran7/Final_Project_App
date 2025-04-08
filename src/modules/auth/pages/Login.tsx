@@ -335,8 +335,9 @@ const Login: React.FC = () => {
                   src={src}
                   alt={`Slide ${index}`}
                   style={{
-                    width: "100%",
+                    maxWidth: "100%",
                     height: "100%",
+                    aspectRatio: "1/1"
                   }}
                 />
               </SwiperSlide>

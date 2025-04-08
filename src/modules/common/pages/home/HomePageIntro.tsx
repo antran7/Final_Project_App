@@ -40,28 +40,38 @@ const AboutUs = () => {
             component="img"
             src={item.img}
             alt={item.title}
-            sx={{ width: 450, height: item.height, objectFit: "cover" }}
+            sx={{
+              width: {
+                xs: 300, // nhỏ hơn cho mobile
+                sm: 380,
+                md: 450, // giữ nguyên khi lớn hơn
+              },
+              height: item.height,
+              objectFit: "cover",
+            }}
             className="animate-fadeIn"
           />
         ))}
       </Box>
 
-      <div className="flex items-center h-[680px] mt-24">
-        <div className="flex-1 flex flex-col justify-center items-end max-w-[50%] bg-[#BEDBFF] h-full pr-12">
-          <h2 className="text-[60px] font-bold relative mb-8 flex items-center">
+      <div className="flex flex-col md:flex-row items-center h-auto md:h-[680px] mt-24">
+        <div className="flex-1 flex flex-col justify-center items-end bg-[#BEDBFF] h-full pr-6 md:pr-12 py-10 md:py-0 px-4 md:px-0 w-full md:max-w-[50%]">
+          <h2 className="text-[40px] md:text-[60px] font-bold relative mb-8 flex items-center text-right md:text-center w-full justify-end">
             ABOUT US
             <EastIcon
-              className="ml-5 text-[50px] cursor-pointer hover:bg-gray-200 hover:rounded-full hover:text-[#D1D7F1]"
+              className="ml-4 text-[32px] md:text-[50px] cursor-pointer hover:bg-gray-200 hover:rounded-full hover:text-[#D1D7F1]"
               onClick={() => navigate("/about")}
             />
-            <span className="absolute bottom-0 left-0 w-[120px] h-2 bg-[#EDCD1F]"></span>
+            <span className="absolute bottom-0 right-0 w-[120px] h-2 bg-[#EDCD1F]"></span>
           </h2>
-          <p className="font-light w-[50%]">
+          <p className="font-light text-justify md:text-right text-sm md:text-base w-full md:w-[80%]">
             Our platform is designed to streamline payroll processing and attendance management for FPT employees, ensuring accuracy, efficiency, and transparency. We simplify the entire workflow, from tracking working hours to approving and processing payments, reducing administrative burdens and minimizing errors.
             <br />
             With an intuitive and user-friendly interface, employees can easily submit attendance records, request adjustments, and track payment statuses in real time. Meanwhile, managers can efficiently review and approve requests, ensuring that payroll calculations are accurate and compliant with company policies. We prioritize automation and efficiency, integrating smart features that help businesses optimize timekeeping, salary calculations, and reporting.
           </p>
         </div>
+
+        {/* Ảnh bên phải */}
         <Box
           className="flex-1 h-full bg-cover bg-center bg-fixed"
           sx={{
@@ -70,6 +80,7 @@ const AboutUs = () => {
           }}
         />
       </div>
+
     </div>
   );
 };

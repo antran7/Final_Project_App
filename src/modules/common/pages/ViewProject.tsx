@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import './ViewProject.css'
 import Layout from '../../../shared/layouts/Layout'
 import Search from '../../../shared/components/searchComponent/Search'
-import { Autocomplete, Button, Grid, IconButton, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Grid, IconButton, InputLabel, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useForm } from 'react-hook-form'
@@ -216,99 +216,108 @@ const ViewProject: React.FC = () => {
                     </ToggleButtonGroup>
                 </div>
                 {alignment === "advanced" && (
-                    <Grid container spacing={2} className='search-bar-filter'>
-                        <Grid item xs={0.75} sx={{ mr: -10 }}>
-                            <InputLabel>Username:</InputLabel>
-                        </Grid>
-                        <Grid item xs={2.25}>
-                            <Autocomplete
-                                options={filteredUsers}
-                                getOptionLabel={(option) => option.user_name}
-                                value={selectedUser}
-                                onChange={(_, newValue) => {
-                                    setSelectedUser(newValue as User);
-                                    setValue("user_id", newValue ? newValue._id : "");
-                                    trigger("user_id");
-                                    handleSubmitSearch();
-                                }}
-                                inputValue={inputValue}
-                                onInputChange={(_, newInputValue) => {
-                                    setInputValue(newInputValue);
-                                    debounceSearchUser(newInputValue);
-                                }}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        fullWidth
-                                        id="outlined-basic"
-                                        variant="outlined"
-                                        error={!!errors.user_id}
-                                        helperText={errors.user_id?.message}
-                                    />
-                                )}
-                            />
-                        </Grid>
-
-                        <Grid item xs={0.75} sx={{ mr: -10 }}>
-                            <InputLabel>Start Date:</InputLabel>
-                        </Grid>
-                        <Grid item xs={2.25}>
-                            <TextField
-                                fullWidth
-                                type="date"
-                                InputLabelProps={{ shrink: true }}
-                                {...register("startDate", {
-                                    validate: (value) => {
-                                        const endDate = getValues("endDate");
-                                        if (endDate && value && new Date(value) > new Date(endDate)) {
-                                            return "Start Date must be before End Date";
-                                        }
-                                        return true;
-                                    }
-                                })}
-                                error={!!errors.startDate}
-                                helperText={errors.startDate?.message}
-                                onChange={(e) => {
-                                    setValue("startDate", e.target.value);
-                                    trigger("endDate");
-                                    handleSubmitSearch();
-                                }}
-                            />
+                    <Grid container spacing={2} className="search-bar-filter">
+                        {/* Username */}
+                        <Grid item xs={12} md={3}>
+                            <Box display="flex" flexDirection="column">
+                                <InputLabel sx={{ mb: 1 }}>Username:</InputLabel>
+                                <Autocomplete
+                                    options={filteredUsers}
+                                    getOptionLabel={(option) => option.user_name}
+                                    value={selectedUser}
+                                    onChange={(_, newValue) => {
+                                        setSelectedUser(newValue as User);
+                                        setValue("user_id", newValue ? newValue._id : "");
+                                        trigger("user_id");
+                                        handleSubmitSearch();
+                                    }}
+                                    inputValue={inputValue}
+                                    onInputChange={(_, newInputValue) => {
+                                        setInputValue(newInputValue);
+                                        debounceSearchUser(newInputValue);
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            fullWidth
+                                            id="outlined-basic"
+                                            variant="outlined"
+                                            error={!!errors.user_id}
+                                            helperText={errors.user_id?.message}
+                                        />
+                                    )}
+                                />
+                            </Box>
                         </Grid>
 
-                        <Grid item xs={0.75} sx={{ mr: -10 }}>
-                            <InputLabel>End Date:</InputLabel>
-                        </Grid>
-                        <Grid item xs={2.25}>
-                            <TextField
-                                fullWidth
-                                type="date"
-                                InputLabelProps={{ shrink: true }}
-                                {...register("endDate", {
-                                    validate: (value) => {
-                                        const startDate = getValues("startDate");
-                                        if (startDate && value && new Date(value) < new Date(startDate)) {
-                                            return "End Date must be after Start Date";
+                        {/* Start Date */}
+                        <Grid item xs={12} md={3}>
+                            <Box display="flex" flexDirection="column">
+                                <InputLabel sx={{ mb: 1 }}>Start Date:</InputLabel>
+                                <TextField
+                                    fullWidth
+                                    type="date"
+                                    InputLabelProps={{ shrink: true }}
+                                    {...register("startDate", {
+                                        validate: (value) => {
+                                            const endDate = getValues("endDate");
+                                            if (endDate && value && new Date(value) > new Date(endDate)) {
+                                                return "Start Date must be before End Date";
+                                            }
+                                            return true;
                                         }
-                                        return true;
-                                    }
-                                })}
-                                error={!!errors.endDate}
-                                helperText={errors.endDate?.message}
-                                onChange={async (e) => {
-                                    setValue("endDate", e.target.value);
-                                    await trigger("startDate");
-                                    await handleSubmitSearch();
-                                }}
-                            />
+                                    })}
+                                    error={!!errors.startDate}
+                                    helperText={errors.startDate?.message}
+                                    onChange={(e) => {
+                                        setValue("startDate", e.target.value);
+                                        trigger("endDate");
+                                        handleSubmitSearch();
+                                    }}
+                                />
+                            </Box>
                         </Grid>
-                        <Grid item xs={1.5} sx={{ fontSize: '18px' }}>
-                            <Button
-                                startIcon={<CancelOutlinedIcon sx={{ fontSize: '18px' }} />}
-                                onClick={handleClearFilters}
-                            >
-                                Clear All Filters
-                            </Button>
+
+                        {/* End Date */}
+                        <Grid item xs={12} md={3}>
+                            <Box display="flex" flexDirection="column">
+                                <InputLabel sx={{ mb: 1 }}>End Date:</InputLabel>
+                                <TextField
+                                    fullWidth
+                                    type="date"
+                                    InputLabelProps={{ shrink: true }}
+                                    {...register("endDate", {
+                                        validate: (value) => {
+                                            const startDate = getValues("startDate");
+                                            if (startDate && value && new Date(value) < new Date(startDate)) {
+                                                return "End Date must be after Start Date";
+                                            }
+                                            return true;
+                                        }
+                                    })}
+                                    error={!!errors.endDate}
+                                    helperText={errors.endDate?.message}
+                                    onChange={async (e) => {
+                                        setValue("endDate", e.target.value);
+                                        await trigger("startDate");
+                                        await handleSubmitSearch();
+                                    }}
+                                />
+                            </Box>
+                        </Grid>
+
+                        {/* Clear Filters */}
+                        <Grid item xs={12} md={3}>
+                            <Box display="flex" flexDirection="column" justifyContent="flex-end" height="100%">
+                                <InputLabel sx={{ visibility: "hidden", mb: 1 }}>Label</InputLabel>
+                                <Button
+                                    fullWidth
+                                    startIcon={<CancelOutlinedIcon sx={{ fontSize: "18px" }} />}
+                                    onClick={handleClearFilters}
+                                >
+                                    Clear All Filters
+                                </Button>
+                            </Box>
                         </Grid>
                     </Grid>
                 )}
